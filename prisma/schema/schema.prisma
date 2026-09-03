@@ -12,10 +12,3 @@ datasource db {
   provider = "postgresql"
 }
 
-
-
-model User { 
-  id    Int     
-  email String  @unique
-  name  String?
-} 

@@ -7,8 +7,6 @@
 // import { jwtUtils } from "../utils/jwt";
 // import { IRequestUser } from "../module/auth/auth.interface";
 
-
-
 // declare global {
 // 	namespace Express {
 // 		interface Request {

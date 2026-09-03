@@ -1,0 +1,17 @@
+model User {
+    id  String  @id @default(uuid())
+
+    name String
+    email String @unique
+    phone String @unique
+    password String
+    role Role
+    isDeleted Boolean   @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    customer Customer?
+    area Area?
+
+    @@map("users")
+}

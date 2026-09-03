@@ -1,0 +1,37 @@
+enum Role {
+    ADMIN
+    COLLECTOR
+    CUSTOMER
+}
+
+enum CustomerStatus {
+  ACTIVE        
+  INACTIVE      
+  // SUSPENDED     
+  // DISCONNECTED  
+}
+
+
+enum BillStatus {
+  UNPAID
+  PAID
+  OVERDUE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PaymentMethod {
+  CASH_COLLECTOR   
+  BKASH           
+}
+
+enum PaymentStatus {
+  PENDING          
+  SUCCESS         
+  FAILED          
+  CANCELLED        
+}

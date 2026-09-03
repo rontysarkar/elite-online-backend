@@ -1,0 +1,17 @@
+model Bill {
+    id String @id @default(uuid())
+    month Int
+    year Int
+    amount Decimal @db.Decimal(10,2)
+    status BillStatus @default(UNPAID)
+    dueDate DateTime
+    createAT DateTime @default(now())
+    
+    customerId String
+    customer Customer @relation(fields: [customerId],references: [id],onDelete: Cascade)
+
+    payment Payment?
+    
+    @@map("bills")
+
+}
