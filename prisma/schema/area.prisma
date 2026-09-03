@@ -1,12 +1,13 @@
 model Area {
-    id String @id @default(uuid())
-    name String
-    createdAt DateTime @default(now())
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
 
-    collectorId String @unique
-    collector User @relation(fields: [collectorId],references: [id],onDelete: Restrict)
+  collectorId String @unique
+  collector   User   @relation(fields: [collectorId], references: [id], onDelete: Restrict)
 
-    customer Customer[]
-    ConnectionRequest ConnectionRequest[]
-    @@map("area")
+  customer          Customer[]
+  ConnectionRequest ConnectionRequest[]
+
+  @@map("area")
 }

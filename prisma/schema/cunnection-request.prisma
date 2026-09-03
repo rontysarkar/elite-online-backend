@@ -1,20 +1,18 @@
 model ConnectionRequest {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    name String
-    email String
-    phone String
-    address String
+  name    String
+  email   String
+  phone   String
+  address String
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 
-    areaId String
-    area Area @relation(fields: [areaId],references: [id])
+  areaId String
+  area   Area   @relation(fields: [areaId], references: [id])
 
-    packageId String
-    package Package @relation(fields: [packageId],references: [id])
+  packageId String
+  package   Package @relation(fields: [packageId], references: [id])
 
-
-
-    @@map("connection_request")
+  @@map("connection_request")
 }

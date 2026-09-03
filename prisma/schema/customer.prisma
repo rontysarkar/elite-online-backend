@@ -1,22 +1,22 @@
 model Customer {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    name String
-    address String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  name      String
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    userId String @unique
-    user User @relation(fields: [userId],references: [id], onDelete: Cascade,onUpdate: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-    packageId String
-    package Package @relation(fields: [packageId],references: [id], onDelete: Restrict)
+  packageId String
+  package   Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
 
-    areaId String
-    area Area @relation(fields: [areaId],references: [id],onDelete: Restrict)
+  areaId String
+  area   Area   @relation(fields: [areaId], references: [id], onDelete: Restrict)
 
-    bill Bill[]
-    payment Payment[]
-    
-    @@map("customers")
+  bill    Bill[]
+  payment Payment[]
+
+  @@map("customers")
 }

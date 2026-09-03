@@ -1,10 +1,11 @@
 model Package {
-    id String @id @default(uuid())
-    name String
-    speed String
-    price Decimal @db.Decimal(10,2)
+  id    String  @id @default(uuid())
+  name  String
+  speed String
+  price Decimal @db.Decimal(10, 2)
 
-    customer Customer[]
-    ConnectionRequest ConnectionRequest[]
-    @@map("packages")
+  customer          Customer[]
+  ConnectionRequest ConnectionRequest[]
+
+  @@map("packages")
 }

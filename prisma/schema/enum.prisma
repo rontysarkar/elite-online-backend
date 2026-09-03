@@ -1,16 +1,15 @@
 enum Role {
-    ADMIN
-    COLLECTOR
-    CUSTOMER
+  ADMIN
+  COLLECTOR
+  CUSTOMER
 }
 
 enum CustomerStatus {
-  ACTIVE        
-  INACTIVE      
+  ACTIVE
+  INACTIVE
   // SUSPENDED     
   // DISCONNECTED  
 }
-
 
 enum BillStatus {
   UNPAID
@@ -25,13 +24,13 @@ enum RequestStatus {
 }
 
 enum PaymentMethod {
-  CASH_COLLECTOR   
-  BKASH           
+  CASH_COLLECTOR
+  BKASH
 }
 
 enum PaymentStatus {
-  PENDING          
-  SUCCESS         
-  FAILED          
-  CANCELLED        
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
 }

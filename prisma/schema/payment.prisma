@@ -1,26 +1,26 @@
 model Payment {
-    id String @id @default(uuid())
-    
-    amount Decimal @db.Decimal(10,2)
-    method PaymentMethod
-    status PaymentStatus @default(PENDING) 
+  id String @id @default(uuid())
 
-    // when collector collect bill
-    collectedById String?
+  amount Decimal       @db.Decimal(10, 2)
+  method PaymentMethod
+  status PaymentStatus @default(PENDING)
 
-    //when bkash payment
-    trxId String?
-    gatewayPayload Json?
+  // when collector collect bill
+  collectedById String?
 
-    paidAt DateTime?
+  //when bkash payment
+  trxId          String?
+  gatewayPayload Json?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  paidAt DateTime?
 
-    billId String @unique
-    bill Bill @relation(fields: [billId],references: [id],onDelete: Cascade)
-    customerId String
-    customer Customer @relation(fields: [customerId],references: [id],onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@map("payments")
+  billId     String   @unique
+  bill       Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
 }
