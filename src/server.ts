@@ -1,11 +1,14 @@
 import app from "./app";
 import config from "./app/config";
 import { prisma } from "./app/lib/prisma";
+import { seedAdmin, seedCollector } from "./app/utils/seed";
 
 async function main() {
 	try {
 		await prisma.$connect();
 		console.log("Database Connect Successfully");
+		seedAdmin();
+		seedCollector();
 		app.listen(config.port, () => {
 			console.log(`Server Running int the port : ${config.port}`);
 		});
