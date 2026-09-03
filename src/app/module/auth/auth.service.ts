@@ -9,57 +9,57 @@ import config from "../../config";
 import { SignOptions } from "jsonwebtoken";
 
 const loginUser = async (payload: ILoginPayload) => {
-  const { password } = payload;
-  const email = payload.email.trim().toLowerCase();
+	const { password } = payload;
+	const email = payload.email.trim().toLowerCase();
 
-  const isUserExist = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+	const isUserExist = await prisma.user.findUnique({
+		where: {
+			email,
+		},
+	});
 
-  if (!isUserExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
-  }
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+	}
 
-  if (isUserExist.isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, "User Is Deleted");
-  }
+	if (isUserExist.isDeleted) {
+		throw new AppError(httpStatus.FORBIDDEN, "User Is Deleted");
+	}
 
-  const isPasswordMatch = await bcrypt.compare(
-    password,
-    isUserExist.password as string,
-  );
+	const isPasswordMatch = await bcrypt.compare(
+		password,
+		isUserExist.password as string,
+	);
 
-  if (!isPasswordMatch) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid Credentials");
-  }
+	if (!isPasswordMatch) {
+		throw new AppError(httpStatus.UNAUTHORIZED, "Invalid Credentials");
+	}
 
-  const jwtPayload = {
-    userId: isUserExist.id,
-    name: isUserExist.name,
-    email: isUserExist.email,
-    Role: isUserExist.role,
-  };
+	const jwtPayload = {
+		userId: isUserExist.id,
+		name: isUserExist.name,
+		email: isUserExist.email,
+		Role: isUserExist.role,
+	};
 
-  const accessToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as SignOptions,
-  );
+	const accessToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_access_secret as string,
+		config.jwt_access_expires_in as SignOptions,
+	);
 
-  const refreshToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as SignOptions,
-  );
+	const refreshToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_refresh_secret as string,
+		config.jwt_refresh_expires_in as SignOptions,
+	);
 
-  return {
-    accessToken,
-    refreshToken,
-  };
+	return {
+		accessToken,
+		refreshToken,
+	};
 };
 
 export const AuthService = {
-    loginUser,
-}
+	loginUser,
+};
