@@ -39,7 +39,7 @@ const loginUser = async (payload: ILoginPayload) => {
 		userId: isUserExist.id,
 		name: isUserExist.name,
 		email: isUserExist.email,
-		Role: isUserExist.role,
+		role: isUserExist.role,
 	};
 
 	const accessToken = jwtUtils.createToken(

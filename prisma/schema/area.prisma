@@ -3,7 +3,7 @@ model Area {
   name      String
   createdAt DateTime @default(now())
 
-  collectorId String @unique
+  collectorId String 
   collector   User   @relation(fields: [collectorId], references: [id], onDelete: Restrict)
 
   customer          Customer[]
