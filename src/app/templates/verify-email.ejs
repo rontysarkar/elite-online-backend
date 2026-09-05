@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Request Verification - Elite Online</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f8fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333333;
+        }
+        .email-wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f4f8fb;
+            padding: 40px 0;
+        }
+        .email-content {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 162, 237, 0.08);
+        }
+        .email-header {
+            background-color: #ffffff;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 2px solid #f0f4f8;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 22px;
+            color: #00a2ed;
+            font-weight: 700;
+        }
+        .email-body {
+            padding: 40px 30px;
+            text-align: left;
+        }
+        .email-body h2 {
+            color: #1e293b;
+            font-size: 19px;
+            margin-top: 0;
+        }
+        .email-body p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555555;
+            margin-bottom: 20px;
+        }
+        .otp-box {
+            background-color: #f0f9ff;
+            border: 2px dashed #00a2ed;
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #00a2ed;
+            margin: 30px 0;
+        }
+        .email-footer {
+            background-color: #f8fafc;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #888888;
+            border-top: 1px solid #f0f4f8;
+        }
+        .email-footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <table class="email-wrapper" role="presentation" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center">
+                <table class="email-content" role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <!-- Header -->
+                    <tr>
+                        <td class="email-header">
+                            <h1>Elite Online</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td class="email-body">
+                            <h2>Hello <%= typeof userName !== 'undefined' ? userName : 'Customer' %>,</h2>
+                            <p>Thank you for submitting a new connection request with <strong>Elite Online</strong>! To verify your email address and process your request, please use the One-Time Password (OTP) below:</p>
+                            
+                            <div class="otp-box">
+                                <%= otpCode %>
+                            </div>
+
+                            <p>This verification code is valid for the next 5 minutes. Once you verify your email, our team will review your connection request and get in touch with you shortly.</p>
+                            
+                            <p>If you did not request a broadband connection with us, please safely ignore this email.</p>
+                            
+                            <p style="margin-top: 30px; margin-bottom: 0;">Best regards,<br><strong>The Elite Online Team</strong></p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td class="email-footer">
+                            <p>&copy; <%= new Date().getFullYear() %> Elite Online. All rights reserved.</p>
+                            <p>Fastest Broadband in Your Area</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

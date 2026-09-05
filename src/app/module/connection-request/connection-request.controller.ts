@@ -29,7 +29,7 @@ const requestedEmailVerify = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Connection Request Send Successfully",
+    message: "Your connection request has been accepted. Our team will get in touch with you very soon.",
     data: result,
   });
 });

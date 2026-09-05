@@ -4,6 +4,10 @@ import { AppError } from "../../utils/AppError";
 import { ICreateConnectionRequestPayload } from "./connection-request.interface";
 import httpStatus from "http-status";
 import crypto from "crypto";
+import { transporter } from "../../lib/nodemailer";
+import config from "../../config";
+import path from 'path'
+import ejs from 'ejs'
 
 const createConnectionRequest = async (
   payload: ICreateConnectionRequestPayload,
@@ -48,6 +52,20 @@ const createConnectionRequest = async (
     EX: 60 * 5,
   });
 
+  const html = await ejs.renderFile(path.join(process.cwd(),"src/app/templates/verify-email.ejs"),{
+    userName:name,
+    otpCode:otp
+  })
+
+  const nodemailerOptions = {
+    from:config.smtp_sender_email,
+    to:email,
+    subject:"Verify Your Email Address",
+    html
+  }
+
+  await transporter.sendMail(nodemailerOptions)
+
   return null;
 };
 
@@ -78,6 +96,8 @@ const requestedEmailVerify = async (email: string, otp: string) => {
   if (redisOtp !== otp) {
     throw new AppError(httpStatus.UNAUTHORIZED, "Invalid Otp");
   }
+
+  await redisClient.del(requestEmailVerifyOtpKey);
 
   const connectionRequest = await prisma.connectionRequest.update({
     where:{
