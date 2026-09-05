@@ -2,9 +2,10 @@ model ConnectionRequest {
   id String @id @default(uuid())
 
   name    String
-  email   String
+  email   String @unique
   phone   String
   address String
+  emailVerified Boolean @default(false)
 
   createdAt DateTime @default(now())
 

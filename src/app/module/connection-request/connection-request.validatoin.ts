@@ -17,3 +17,9 @@ export const CreateConnectionRequestSchema = z.object({
   areaId: z.string("Area ID is required"),
   packageId: z.string("Package ID is required"),
 });
+
+
+export const RequestedEmailVerifySchema = z.object({
+  email:z.email(),
+  otp:z.number(),
+})

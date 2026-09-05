@@ -4,18 +4,37 @@ import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { ConnectionRequestServices } from "./connection-request.service";
 
-const createConnectionRequest = catchAsync(async (req: Request, res: Response) => {
-  const payload = req.body;
-  const result = await ConnectionRequestServices.createConnectionRequest(payload);
+const createConnectionRequest = catchAsync(
+  async (req: Request, res: Response) => {
+    const payload = req.body;
+    const result =
+      await ConnectionRequestServices.createConnectionRequest(payload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "An OTP has been sent to your email. Please check and verify.",
+      data: result,
+    });
+  },
+);
+
+const requestedEmailVerify = catchAsync(async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  const result = await ConnectionRequestServices.requestedEmailVerify(
+    email,
+    String(otp),
+  );
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Connection Request Created Successfully",
+    message: "Connection Request Send Successfully",
     data: result,
   });
 });
 
 export const ConnectionRequestController = {
-    createConnectionRequest,
-}
+  createConnectionRequest,
+  requestedEmailVerify,
+};
