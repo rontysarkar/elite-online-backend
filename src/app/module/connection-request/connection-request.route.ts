@@ -25,4 +25,6 @@ router.post(
   ConnectionRequestController.acceptConnectionRequest,
 );
 
+router.get('/',auth(Role.ADMIN),ConnectionRequestController.getAllConnectionRequest);
+
 export const CreateConnectionRequestRoutes = router;

@@ -52,8 +52,23 @@ const acceptConnectionRequest = catchAsync(
   },
 );
 
+const getAllConnectionRequest = catchAsync(
+  async (req: Request, res: Response) => {
+   
+    const result = await ConnectionRequestServices.getAllConnectionRequest();
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message:
+        "Connection Request Retrieve Successfully",
+      data: result,
+    });
+  },
+);
+
 export const ConnectionRequestController = {
   createConnectionRequest,
   requestedEmailVerify,
   acceptConnectionRequest,
+  getAllConnectionRequest,
 };

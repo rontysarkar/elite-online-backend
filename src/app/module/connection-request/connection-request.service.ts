@@ -194,8 +194,27 @@ const acceptConnectionRequest = async (requestedId: string) => {
   return transactionResult;
 };
 
+const getAllConnectionRequest = async()=>{
+
+  const allRequest = await prisma.connectionRequest.findMany({
+    include:{
+      area:{
+        select:{
+          name:true
+        }
+      },
+      package:true
+    }
+  });
+
+  return allRequest;
+}
+
+
+
 export const ConnectionRequestServices = {
   createConnectionRequest,
   requestedEmailVerify,
   acceptConnectionRequest,
+  getAllConnectionRequest
 };

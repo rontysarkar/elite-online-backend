@@ -3,32 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Account Created - Elite Online</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f4f8fb;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333333;
-        }
+        /* Reset styles for email clients */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f8fb; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333333; }
+
+        /* Main Wrapper */
         .email-wrapper {
-            width: 100%;
+            width: 100% !important;
             table-layout: fixed;
             background-color: #f4f8fb;
-            padding: 40px 0;
+            padding: 20px 0;
         }
+        
+        /* Container */
         .email-content {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 600px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
             background-color: #ffffff;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 162, 237, 0.08);
         }
+
+        /* Header */
         .email-header {
             background-color: #ffffff;
-            padding: 25px;
+            padding: 25px 20px;
             text-align: center;
             border-bottom: 2px solid #f0f4f8;
         }
@@ -38,14 +45,17 @@
             color: #00a2ed;
             font-weight: 700;
         }
+
+        /* Body */
         .email-body {
-            padding: 40px 30px;
+            padding: 30px 25px;
             text-align: left;
         }
         .email-body h2 {
             color: #1e293b;
             font-size: 19px;
             margin-top: 0;
+            margin-bottom: 15px;
         }
         .email-body p {
             font-size: 15px;
@@ -53,12 +63,15 @@
             color: #555555;
             margin-bottom: 20px;
         }
+
+        /* Credentials Box */
         .credentials-box {
             background-color: #f0f9ff;
             border: 1px solid #bae6fd;
             border-radius: 8px;
-            padding: 20px;
+            padding: 18px;
             margin: 25px 0;
+            word-break: break-all;
         }
         .credentials-box p {
             margin: 8px 0;
@@ -68,23 +81,29 @@
         .credentials-box strong {
             color: #00a2ed;
         }
+
+        /* Button */
         .btn-container {
             text-align: center;
             margin: 30px 0;
         }
         .login-btn {
             background-color: #00a2ed;
-            color: #ffffff;
-            padding: 12px 25px;
+            color: #ffffff !important;
+            padding: 12px 30px;
             text-decoration: none;
             border-radius: 6px;
             font-weight: 600;
             font-size: 15px;
             display: inline-block;
+            mso-padding-alt: 0;
+            text-underline-color: #00a2ed;
         }
+
+        /* Footer */
         .email-footer {
             background-color: #f8fafc;
-            padding: 20px 30px;
+            padding: 20px 25px;
             text-align: center;
             font-size: 13px;
             color: #888888;
@@ -93,12 +112,43 @@
         .email-footer p {
             margin: 5px 0;
         }
+
+        /* Media Queries for Mobile Screens */
+        @media screen and (max-width: 600px) {
+            .email-wrapper {
+                padding: 10px !important;
+            }
+            .email-content {
+                width: 100% !important;
+                border-radius: 6px !important;
+            }
+            .email-body {
+                padding: 20px 15px !important;
+            }
+            .email-header {
+                padding: 20px 15px !important;
+            }
+            .credentials-box {
+                padding: 12px !important;
+            }
+            .login-btn {
+                display: block !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                padding: 12px 0 !important;
+            }
+        }
     </style>
 </head>
 <body>
     <table class="email-wrapper" role="presentation" border="0" cellpadding="0" cellspacing="0">
         <tr>
             <td align="center">
+                <!--[if (gte mso 9)|(IE)]>
+                <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+                <tr>
+                align="center">
+                <![endif]-->
                 <table class="email-content" role="presentation" border="0" cellpadding="0" cellspacing="0">
                     <!-- Header -->
                     <tr>
@@ -110,9 +160,9 @@
                     <tr>
                         <td class="email-body">
                             <h2>Hello <%= typeof userName !== 'undefined' ? userName : 'Valued Customer' %>,</h2>
-                            <p>Great news! Your connection request has been approved by our admin team, and your customer account with <strong>Elite Online</strong> has been successfully created.</p>
+                            <p>Your <strong>Elite Online</strong> account has been successfully created.</p>
                             
-                            <p>You can now log in to your customer portal using your email and the temporary password provided below:</p>
+                            <p>You can now log in to your portal using your email and the temporary password provided below:</p>
 
                             <div class="credentials-box">
                                 <p><strong>Email:</strong> <%= userEmail %></p>
@@ -123,9 +173,9 @@
                                 <a href="https://yourwebsite.com/login" target="_blank" class="login-btn">Login to Your Account</a>
                             </div>
 
-                            <p style="font-size: 13px; color: #e11d48;"><strong>Security Note:</strong> For your security, we strongly recommend that you log in and change your password as soon as possible from your account settings.</p>
+                            <p style="font-size: 13px; color: #e11d48; margin-bottom: 25px;"><strong>Security Note:</strong> For your security, we strongly recommend that you log in and change your password as soon as possible from your account settings.</p>
                             
-                            <p style="margin-top: 30px; margin-bottom: 0;">Best regards,<br><strong>The Elite Online Team</strong></p>
+                            <p style="margin-bottom: 0;">Best regards,<br><strong>The Elite Online Team</strong></p>
                         </td>
                     </tr>
                     <!-- Footer -->
@@ -136,6 +186,11 @@
                         </td>
                     </tr>
                 </table>
+                <!--[if (gte mso 9)|(IE)]>
+                </td>
+                </tr>
+                </table>
+                <![endif]-->
             </td>
         </tr>
     </table>

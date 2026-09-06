@@ -9,6 +9,7 @@ import { AuthRoutes } from "./app/module/auth/auth.route";
 import { PackageRoutes } from "./app/module/package/package.route";
 import { AreaRoutes } from "./app/module/area/area.route";
 import { CreateConnectionRequestRoutes } from "./app/module/connection-request/connection-request.route";
+import { AdminRoutes } from "./app/module/admin/admin.route";
 
 const app: Application = express();
 
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/admin",AdminRoutes);
 app.use("/api/v1/package",PackageRoutes);
 app.use("/api/v1/area",AreaRoutes);
 app.use("/api/v1/connection-request",CreateConnectionRequestRoutes);
