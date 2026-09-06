@@ -29,12 +29,31 @@ const requestedEmailVerify = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "Your connection request has been accepted. Our team will get in touch with you very soon.",
+    message:
+      "Your connection request has been accepted. Our team will get in touch with you very soon.",
     data: result,
   });
 });
 
+const acceptConnectionRequest = catchAsync(
+  async (req: Request, res: Response) => {
+    const { requestedId } = req.params;
+    const result = await ConnectionRequestServices.acceptConnectionRequest(
+      requestedId as string,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message:
+        "Customer Account Created Successfully",
+      data: result,
+    });
+  },
+);
+
 export const ConnectionRequestController = {
   createConnectionRequest,
   requestedEmailVerify,
+  acceptConnectionRequest,
 };

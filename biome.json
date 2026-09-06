@@ -9,7 +9,7 @@
 		"ignoreUnknown": false,
 		"includes": [
 			"**",
-			"!src/app/templates/verify-email.ejs"
+			"!src/app/templates"
 		]
 	},
 	"formatter": {
