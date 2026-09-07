@@ -10,14 +10,15 @@ import { PackageRoutes } from "./app/module/package/package.route";
 import { AreaRoutes } from "./app/module/area/area.route";
 import { CreateConnectionRequestRoutes } from "./app/module/connection-request/connection-request.route";
 import { AdminRoutes } from "./app/module/admin/admin.route";
+import { BillRoutes } from "./app/module/bill/bill.route";
 
 const app: Application = express();
 
 app.use(
-	cors({
-		origin: config.frontend_url,
-		credentials: true,
-	}),
+  cors({
+    origin: config.frontend_url,
+    credentials: true,
+  }),
 );
 
 app.use(express.urlencoded({ extended: true }));
@@ -26,17 +27,18 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
-app.use("/api/v1/admin",AdminRoutes);
-app.use("/api/v1/package",PackageRoutes);
-app.use("/api/v1/area",AreaRoutes);
-app.use("/api/v1/connection-request",CreateConnectionRequestRoutes);
+app.use("/api/v1/admin", AdminRoutes);
+app.use("/api/v1/package", PackageRoutes);
+app.use("/api/v1/area", AreaRoutes);
+app.use("/api/v1/bill", BillRoutes);
+app.use("/api/v1/connection-request", CreateConnectionRequestRoutes);
 
 // Basic route
 app.get("/", async (_req: Request, res: Response) => {
-	res.status(202).json({
-		success: true,
-		message: "Welcome to Elite Online",
-	});
+  res.status(202).json({
+    success: true,
+    message: "Welcome to Elite Online",
+  });
 });
 
 app.use(globalErrorHandler);

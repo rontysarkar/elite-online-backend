@@ -47,7 +47,34 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const result = await AuthService.forgotPassword(email);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "OTP has been sent to your email. Please check and verify.",
+    data: result,
+  });
+});
+
+const setNewPassword = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+
+  const result = await AuthService.setNewPassword(payload);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Your Password has been change , Now you can login",
+    data: null,
+  });
+});
+
 export const AuthController = {
   loginUser,
   changePassword,
+  forgotPassword,
+  setNewPassword,
 };

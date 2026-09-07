@@ -24,6 +24,7 @@ const createCustomerAccount = async (payload: ICreateCustomerAccountPayload) => 
   }
 
   const password = crypto.randomBytes(8).toString("hex");
+  // const password = "customer123"
   const hashPassword = await bcrypt.hash(
     password,
     Number(config.bcrypt_salt_rounds),
@@ -124,6 +125,9 @@ const createCollectorAccount = async (payload: ICreateCollectorAccountPayload) =
 
   return customer;
 };
+
+
+
 
 export const AdminServices = {
   createCustomerAccount,

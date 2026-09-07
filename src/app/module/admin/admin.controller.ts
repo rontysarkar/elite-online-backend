@@ -27,7 +27,11 @@ const createCollectorAccount = catchAsync(async (req: Request, res: Response) =>
   });
 });
 
+
+
+
 export const AdminController = {
     createCustomerAccount,
     createCollectorAccount,
+    
 }

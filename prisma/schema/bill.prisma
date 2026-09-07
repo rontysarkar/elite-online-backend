@@ -11,6 +11,6 @@ model Bill {
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   payment Payment?
-
+  @@unique([customerId, month, year])
   @@map("bills")
 }

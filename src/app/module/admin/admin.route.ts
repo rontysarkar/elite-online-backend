@@ -2,11 +2,12 @@ import { Router } from "express";
 import { AdminController } from "./admin.controller";
 import { validateRequest } from "../../middleware/validatedRequest";
 import { CreateCollectorAccountSchema, CreateCustomerAccountSchema } from "./admin.validation";
+import { auth } from "../../middleware/checkAuth";
+import { Role } from "../../../generated/prisma/enums";
 
 
-const route = Router();
+const router = Router();
 
-route.post("/create-customer",validateRequest(CreateCustomerAccountSchema), AdminController.createCustomerAccount);
-route.post('/create-collector',validateRequest(CreateCollectorAccountSchema),AdminController.createCollectorAccount)
-
-export const AdminRoutes = route;
+router.post("/create-customer",auth(Role.ADMIN),validateRequest(CreateCustomerAccountSchema), AdminController.createCustomerAccount);
+router.post('/create-collector',auth(Role.ADMIN),validateRequest(CreateCollectorAccountSchema),AdminController.createCollectorAccount)
+export const AdminRoutes = router;

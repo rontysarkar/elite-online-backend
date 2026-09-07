@@ -3,10 +3,7 @@ import { z } from "zod";
 const strictBdPhoneRegex = /^01[3-9]\d{8}$/;
 
 export const LoginPayloadSchema = z.object({
-  emailOrPhone: z.union([
-    z.email("Invalid email format"),
-    z.string().regex(strictBdPhoneRegex, "Invalid phone number format"),
-  ]),
+  email: z.email("Invalid email format"),
   password: z.string(),
 });
 
@@ -18,3 +15,13 @@ export const ChangePasswordPayloadSchema = z.object({
     .string("New Password is Required")
     .min(8, { message: "Password must be at least 8 characters long" }),
 });
+
+export const ForgotPasswordPayloadSchema = z.object({
+  email: z.email("Invalid email format"),
+});
+
+export const SetNewPasswordPayloadSchema = z.object({
+  email:z.email("Invalid Email Format"),
+  newPassword:z.string().min(8,"Password Length At Least 8 Character"),
+  otp:z.string(),
+})
