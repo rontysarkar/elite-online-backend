@@ -98,7 +98,20 @@ const changePassword = async (
   return null;
 };
 
-// const forgotPassword = async(email)
+const forgotPassword = async(email : string) =>{
+
+  const isUserExist = await prisma.user.findUnique({
+    where:{
+      email
+    }
+  })
+
+  if(!isUserExist){
+    throw new AppError(httpStatus.NOT_FOUND,"User Dose Not Exist")
+  }
+
+  // const 
+}
 
 export const AuthService = {
   loginUser,
