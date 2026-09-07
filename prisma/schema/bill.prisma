@@ -5,7 +5,7 @@ model Bill {
   amount   Decimal    @db.Decimal(10, 2)
   status   BillStatus @default(UNPAID)
   dueDate  DateTime
-  createAT DateTime   @default(now())
+  createdAt DateTime   @default(now())
 
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)

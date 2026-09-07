@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { BillServices } from "./bill.service";
+// admin
 
 const generateMonthlyBills = catchAsync(async (req: Request, res: Response) => {
   const result = await BillServices.generateMonthlyBills();
@@ -25,7 +26,33 @@ const generateCustomerBill = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getBillsByAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { bills, meta } = await BillServices.getBillsByAdmin(req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Bill Retrieve Successfully",
+    data: bills,
+    meta: meta,
+  });
+});
+
+// customer
+
+const getMyBills = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+  const result = await BillServices.getMyBills(req.query, user?.userId);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Bill Retrieve Successfully",
+    data: result,
+  });
+});
+
 export const BillController = {
   generateMonthlyBills,
   generateCustomerBill,
+  getBillsByAdmin,
+  getMyBills,
 };
