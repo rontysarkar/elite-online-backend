@@ -6,7 +6,7 @@ model Payment {
   status PaymentStatus @default(PENDING)
 
   // when collector collect bill
-  collectedById String?
+  collectorId String?
 
   //when bkash payment
   trxId          String?

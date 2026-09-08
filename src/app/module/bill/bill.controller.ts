@@ -37,6 +37,22 @@ const getBillsByAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+// Collector
+
+
+const getBillsByCollectorId = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+  const { bills, meta } = await BillServices.getBillsByCollectorId(req.query,user);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Bill Retrieve Successfully",
+    data: bills,
+    meta: meta,
+  });
+});
+
 // customer
 
 const getMyBills = catchAsync(async (req: Request, res: Response) => {
@@ -54,5 +70,6 @@ export const BillController = {
   generateMonthlyBills,
   generateCustomerBill,
   getBillsByAdmin,
+  getBillsByCollectorId,
   getMyBills,
 };

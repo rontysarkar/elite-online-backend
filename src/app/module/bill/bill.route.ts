@@ -20,6 +20,10 @@ router.post(
 
 router.get("/bills", auth(Role.ADMIN), BillController.getBillsByAdmin);
 
+// Collector
+
+router.get('/bills/collector',auth(Role.COLLECTOR),BillController.getBillsByCollectorId)
+
 // customer
 router.get("/my-bills", auth(Role.CUSTOMER), BillController.getMyBills);
 

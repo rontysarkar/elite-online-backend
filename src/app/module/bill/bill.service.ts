@@ -1,6 +1,6 @@
 import { Prisma } from "../../../generated/prisma/client";
 import { BillStatus, CustomerStatus } from "../../../generated/prisma/enums";
-import { IQuery } from "../../interface";
+import { IQuery, IRequestUser } from "../../interface";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
@@ -153,6 +153,41 @@ const getBillsByAdmin = async (query: IQuery) => {
 
   const andCondition: BillWhereInput[] = [];
 
+  // searchTerm
+  if(query.searchTerm){
+    andCondition.push({
+      OR:[
+        {
+          customer:{
+            name:{
+              contains:query.searchTerm,
+              mode:'insensitive'
+            }
+          }
+        },
+        {
+          customer:{
+            address:{
+              contains:query.searchTerm,
+              mode:'insensitive'
+            }
+          }
+        },
+        {
+          customer:{
+            area:{
+              name:{
+                contains:query.searchTerm,
+                mode:'insensitive'
+              }
+            }
+          }
+        }
+   
+      ]
+    })
+  }
+
   // Filters
   if (query.status) {
     andCondition.push({
@@ -172,14 +207,22 @@ const getBillsByAdmin = async (query: IQuery) => {
     });
   }
 
-  if(query.collectorId){
+  if(query.areaId){
     andCondition.push({
-        customer:{
-            area:{
-                collectorId:query?.collectorId
-            }
-        }
+      customer:{
+        areaId:query.areaId
+      }
     })
+  }
+
+  if (query.collectorId) {
+    andCondition.push({
+      customer: {
+        area: {
+          collectorId: query?.collectorId,
+        },
+      },
+    });
   }
 
   const bills = await prisma.bill.findMany({
@@ -191,42 +234,156 @@ const getBillsByAdmin = async (query: IQuery) => {
     },
     skip,
     take: limit,
-    include:{
-        customer:{
-            select:{
-                id:true,
-                address:true,
-                user:{
-                    select:{
-                        name:true
-                    }
-                },
-                package:{
-                    select:{
-                        price:true
-                    }
-                }
+    include: {
+      customer: {
+        select: {
+          id: true,
+          address: true,
+          user: {
+            select: {
+              name: true,
             },
-        }
-    }
+          },
+          package: {
+            select: {
+              price: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   const total = await prisma.bill.count({
-    where:{
-        AND:andCondition
-    }
-  }) 
+    where: {
+      AND: andCondition,
+    },
+  });
 
   return {
     bills,
-    meta:{
-        page,
-        limit,
-        total,
-        totalPages:Math.ceil(total/limit)
-    }
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
 
+const getBillsByCollectorId = async (query: IQuery, user: IRequestUser) => {
+  const { limit, page, skip, sortBy, sortOrder } = buildQuery(query);
+
+  const andCondition: BillWhereInput[] = [
+    {
+      customer: {
+        area: {
+          collectorId: user?.userId,
+        },
+      },
+    },
+  ];
+
+  // searchTerm
+  if(query.searchTerm){
+    andCondition.push({
+      OR:[
+        {
+          customer:{
+            name:{
+              contains:query.searchTerm,
+              mode:'insensitive'
+            }
+          }
+        },
+        {
+          customer:{
+            address:{
+              contains:query.searchTerm,
+              mode:'insensitive'
+            }
+          }
+        },
+        {
+          customer:{
+            area:{
+              name:{
+                contains:query.searchTerm,
+                mode:'insensitive'
+              }
+            }
+          }
+        }
+   
+      ]
+    })
   }
+
+  // Filters
+  if (query.status) {
+    andCondition.push({
+      status: query.status,
+    });
+  }
+
+  if (query.month) {
+    andCondition.push({
+      month: Number(query.month),
+    });
+  }
+
+  if (query.year) {
+    andCondition.push({
+      year: Number(query.year),
+    });
+  }
+
+  
+
+  const bills = await prisma.bill.findMany({
+    where: {
+      AND: andCondition,
+    },
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    skip,
+    take: limit,
+    include: {
+      customer: {
+        select: {
+          id: true,
+          address: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          package: {
+            select: {
+              price: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const total = await prisma.bill.count({
+    where: {
+      AND: andCondition,
+    },
+  });
+
+  return {
+    bills,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 export const BillServices = {
@@ -234,4 +391,5 @@ export const BillServices = {
   generateCustomerBill,
   getMyBills,
   getBillsByAdmin,
+  getBillsByCollectorId,
 };
