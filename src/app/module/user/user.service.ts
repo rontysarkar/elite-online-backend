@@ -36,7 +36,7 @@ const getUsers = async (query: IQuery) => {
       page,
       limit,
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPage: Math.ceil(total / limit),
     },
   };
 };

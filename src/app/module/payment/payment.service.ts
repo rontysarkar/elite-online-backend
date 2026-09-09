@@ -127,7 +127,7 @@ const createPaymentByCustomer = async (billId: string, user: IRequestUser) => {
         mode: "0011",
         payerReference: user.email,
         callbackURL: `${config.bkash_callback_url}/payment/bkash-callback`,
-        amount: bill.amount,
+        amount: String(bill.amount),
         currency: "BDT",
         intent: "sale",
         merchantInvoiceNumber: bill?.id,
@@ -136,6 +136,14 @@ const createPaymentByCustomer = async (billId: string, user: IRequestUser) => {
   );
 
   const createPaymentResult = await createPaymentResponse.json();
+
+  // ৩. bKash থেকে কোনো ভুল বা statusCode আসলে এখানেই আটকে দিন
+  if (!createPaymentResult || createPaymentResult.statusCode !== "0000") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      createPaymentResult.statusMessage || "bKash Payment Creation Failed"
+    );
+  }
 
   const transactionResult = await prisma.$transaction(async (tx) => {
     const payment = bill.payment

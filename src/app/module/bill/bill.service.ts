@@ -266,7 +266,7 @@ const getBillsByAdmin = async (query: IQuery) => {
       page,
       limit,
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPage: Math.ceil(total / limit),
     },
   };
 };
@@ -381,7 +381,7 @@ const getBillsByCollectorId = async (query: IQuery, user: IRequestUser) => {
       page,
       limit,
       total,
-      totalPages: Math.ceil(total / limit),
+      totalPage: Math.ceil(total / limit),
     },
   };
 };
