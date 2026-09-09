@@ -13,6 +13,8 @@ import { AdminRoutes } from "./app/module/admin/admin.route";
 import { BillRoutes } from "./app/module/bill/bill.route";
 import { PaymentRoutes } from "./app/module/payment/payment.route";
 import { ReportRoutes } from "./app/module/report/report.route";
+import { UserRoutes } from "./app/module/user/user.route";
+
 
 const app: Application = express();
 
@@ -30,6 +32,7 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/admin", AdminRoutes);
+app.use('/api/v1/user',UserRoutes)
 app.use("/api/v1/package", PackageRoutes);
 app.use("/api/v1/area", AreaRoutes);
 app.use("/api/v1/bill", BillRoutes);

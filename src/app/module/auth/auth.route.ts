@@ -10,5 +10,5 @@ const router = Router();
 router.post("/login", AuthController.loginUser);
 router.patch('/change-password',validateRequest(ChangePasswordPayloadSchema),auth(Role.ADMIN,Role.COLLECTOR,Role.CUSTOMER),AuthController.changePassword)
 router.post('/forgot-password',validateRequest(ForgotPasswordPayloadSchema),AuthController.forgotPassword)
-router.post('/set-new-password',validateRequest(SetNewPasswordPayloadSchema),AuthController.setNewPassword)
+router.post('/reset-password',validateRequest(SetNewPasswordPayloadSchema),AuthController.setNewPassword)
 export const AuthRoutes = router;
