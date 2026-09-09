@@ -20,11 +20,18 @@ router.post(
 
 router.get("/bills", auth(Role.ADMIN), BillController.getBillsByAdmin);
 
-// Collector
+router.get(
+  "/bill/:billId",
+  auth(Role.ADMIN, Role.COLLECTOR),
+  BillController.getBillById,
+);
 
-router.get('/bills/collector',auth(Role.COLLECTOR),BillController.getBillsByCollectorId)
+router.get(
+  "/bills/collector",
+  auth(Role.COLLECTOR),
+  BillController.getBillsByCollectorId,
+);
 
-// customer
 router.get("/my-bills", auth(Role.CUSTOMER), BillController.getMyBills);
 
 export const BillRoutes = router;

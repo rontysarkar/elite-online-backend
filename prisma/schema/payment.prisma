@@ -9,8 +9,10 @@ model Payment {
   collectorId String?
 
   //when bkash payment
+  paymentId String? @unique
   trxId          String?
-  gatewayPayload Json?
+  gatewayResponse Json?
+  merchantInvoiceNumber String?
 
   paidAt DateTime?
 

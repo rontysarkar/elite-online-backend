@@ -12,6 +12,7 @@ import { CreateConnectionRequestRoutes } from "./app/module/connection-request/c
 import { AdminRoutes } from "./app/module/admin/admin.route";
 import { BillRoutes } from "./app/module/bill/bill.route";
 import { PaymentRoutes } from "./app/module/payment/payment.route";
+import { ReportRoutes } from "./app/module/report/report.route";
 
 const app: Application = express();
 
@@ -32,7 +33,8 @@ app.use("/api/v1/admin", AdminRoutes);
 app.use("/api/v1/package", PackageRoutes);
 app.use("/api/v1/area", AreaRoutes);
 app.use("/api/v1/bill", BillRoutes);
-app.use('/api/v1/payment',PaymentRoutes)
+app.use('/api/v1/payment',PaymentRoutes);
+app.use('/api/v1/reports',ReportRoutes)
 app.use("/api/v1/connection-request", CreateConnectionRequestRoutes);
 
 // Basic route

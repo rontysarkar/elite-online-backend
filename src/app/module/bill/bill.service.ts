@@ -386,10 +386,35 @@ const getBillsByCollectorId = async (query: IQuery, user: IRequestUser) => {
   };
 };
 
+const getBillById = async (billId:string)=>{
+
+  const bill = await prisma.bill.findUnique({
+    where:{
+      id:billId
+    },
+    include:{
+      customer:{
+        include:{
+          package:true,
+          user:true,
+          payment:true
+        }
+      }
+    }
+  })
+
+  if(!bill){
+    throw new AppError(httpStatus.NOT_FOUND,"Bill Not Found")
+  }
+
+  return bill;
+}
+
 export const BillServices = {
   generateMonthlyBills,
   generateCustomerBill,
   getMyBills,
   getBillsByAdmin,
   getBillsByCollectorId,
+  getBillById,
 };

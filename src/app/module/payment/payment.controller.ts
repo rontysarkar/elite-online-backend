@@ -18,6 +18,30 @@ const createPaymentByCollector = catchAsync(
   },
 );
 
+const createPaymentByCustomer = catchAsync(
+  async (req: Request, res: Response) => {
+    const { billId } = req.body;
+    const user = req.user!;
+    const result = await PaymentServices.createPaymentByCustomer(billId, user);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Create Payment Successfully,Please Payment using bkash payment",
+      data: result,
+    });
+  },
+);
+
+const bkashPaymentCallback = catchAsync(async (req: Request, res: Response) => {
+  const { redirectUrl } = await PaymentServices.bkashPaymentCallback(
+    req?.query,
+  );
+
+  res.redirect(redirectUrl);
+});
+
 export const PaymentController = {
-    createPaymentByCollector,
-}
+  createPaymentByCollector,
+  createPaymentByCustomer,
+  bkashPaymentCallback,
+};
