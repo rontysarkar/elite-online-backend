@@ -5,7 +5,7 @@ import { IChangePasswordPayload, ILoginPayload, ISetNewPasswordPayload } from ".
 import httpStatus from "http-status";
 import { jwtUtils } from "../../utils/jwt";
 import config from "../../config";
-import { SignOptions } from "jsonwebtoken";
+import { JwtPayload, SignOptions } from "jsonwebtoken";
 import { IRequestUser } from "../../interface";
 import crypto from "crypto";
 import { redisClient } from "../../lib/redis";
@@ -63,6 +63,48 @@ const loginUser = async (payload: ILoginPayload) => {
     accessToken,
     refreshToken,
   };
+};
+
+const createAccessToken = async (token: string) => {
+  const verifyToken = jwtUtils.verifyToken(
+    token as string,
+    config.jwt_refresh_secret as string,
+  );
+  if(!verifyToken?.success){
+    throw new AppError(httpStatus.FORBIDDEN,"Token Invalid")
+  }
+
+  const { data } = verifyToken as JwtPayload;
+
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      id:data.userId,
+    },
+  });
+
+  if (!isUserExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+  }
+
+  if (isUserExist.isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, "User Is Deleted");
+  }
+
+
+  const jwtPayload = {
+    userId: isUserExist.id,
+    name: isUserExist.name,
+    email: isUserExist.email,
+    role: isUserExist.role,
+  };
+
+  const accessToken = jwtUtils.createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as SignOptions,
+  );
+
+  return {accessToken}
 };
 
 const changePassword = async (
@@ -183,6 +225,7 @@ const setNewPassword = async (payload:ISetNewPasswordPayload) => {
 
 export const AuthService = {
   loginUser,
+  createAccessToken,
   changePassword,
   forgotPassword,
   setNewPassword,

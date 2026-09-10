@@ -34,6 +34,25 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createAccessToken = catchAsync(async (req: Request, res: Response) => {
+  const token = req.cookies?.refreshToken;
+  const { accessToken } = await AuthService.createAccessToken(token);
+
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Login Successfully",
+    data: { accessToken },
+  });
+});
+
 const changePassword = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   const user = req.user!;
@@ -74,6 +93,7 @@ const setNewPassword = catchAsync(async (req: Request, res: Response) => {
 
 export const AuthController = {
   loginUser,
+  createAccessToken,
   changePassword,
   forgotPassword,
   setNewPassword,
