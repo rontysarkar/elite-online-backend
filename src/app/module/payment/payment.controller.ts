@@ -40,8 +40,20 @@ const bkashPaymentCallback = catchAsync(async (req: Request, res: Response) => {
   res.redirect(redirectUrl);
 });
 
+const getMyPayments = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user!;
+  const result = await PaymentServices.getMyPayments(user);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Retrieve Payments Successfully",
+    data: result,
+  });
+});
+
 export const PaymentController = {
   createPaymentByCollector,
   createPaymentByCustomer,
   bkashPaymentCallback,
+  getMyPayments,
 };

@@ -16,6 +16,20 @@ const createArea = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const updatedAreaCollector = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+  const {areaId} = req.params;
+  const result = await AreaServices.updatedAreaCollector(payload,areaId as string);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Area Collector Updated Successfully",
+    data: result,
+  });
+});
+
 const getAllArea = catchAsync(async (req: Request, res: Response) => {
   const result = await AreaServices.getAllArea();
 
@@ -23,6 +37,18 @@ const getAllArea = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: httpStatus.OK,
     message: "All Area Retrieve Successfully",
+    data: result,
+  });
+});
+
+
+const getAreaById = catchAsync(async (req: Request, res: Response) => {
+  const {areaId} = req.params;
+  const result = await AreaServices.getAreaById(areaId as string);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Area Retrieve Successfully",
     data: result,
   });
 });
@@ -42,5 +68,7 @@ const getCollectorArea = catchAsync(async (req: Request, res: Response) => {
 export const AreaController = {
     createArea,
     getAllArea,
-    getCollectorArea
+    getAreaById,
+    getCollectorArea,
+    updatedAreaCollector,
 }

@@ -126,7 +126,7 @@ const createPaymentByCustomer = async (billId: string, user: IRequestUser) => {
       body: JSON.stringify({
         mode: "0011",
         payerReference: user.email,
-        callbackURL: `${config.bkash_callback_url}/payment/bkash-callback`,
+        callbackURL: `${config.bkash_callback_url}/payments/bkash-callback`,
         amount: String(bill.amount),
         currency: "BDT",
         intent: "sale",
@@ -276,8 +276,25 @@ const bkashPaymentCallback = async (query: Record<string, any>) => {
   return transactionResult;
 };
 
+const getMyPayments = async(user:IRequestUser) =>{
+
+  const payments = await prisma.payment.findMany({
+    where:{
+      customer:{
+        userId:user.userId
+      }
+    },
+    include:{
+      bill:true
+    }
+  })
+
+  return payments;
+}
+
 export const PaymentServices = {
   createPaymentByCollector,
   createPaymentByCustomer,
   bkashPaymentCallback,
+  getMyPayments,
 };

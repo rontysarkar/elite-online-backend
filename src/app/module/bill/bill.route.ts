@@ -8,30 +8,34 @@ const router = Router();
 // admin
 
 router.post(
-  "/generate-monthly-bills",
+  "/generate",
   auth(Role.ADMIN),
   BillController.generateMonthlyBills,
 );
 router.post(
-  "/generate-customer-bill/:customerId",
+  "/generate/:customerId",
   auth(Role.ADMIN),
   BillController.generateCustomerBill,
 );
 
-router.get("/bills", auth(Role.ADMIN), BillController.getBillsByAdmin);
+router.get("/", auth(Role.ADMIN), BillController.getBillsByAdmin);
 
 router.get(
-  "/bill/:billId",
+  "/collector/bills",
+  auth(Role.COLLECTOR),
+  BillController.getBillsByCollectorId,
+);
+
+router.get(
+  "/:billId",
   auth(Role.ADMIN, Role.COLLECTOR),
   BillController.getBillById,
 );
 
 router.get(
-  "/bills/collector",
-  auth(Role.COLLECTOR),
-  BillController.getBillsByCollectorId,
+  "/customer/my-bills",
+  auth(Role.CUSTOMER),
+  BillController.getMyBills,
 );
-
-router.get("/my-bills", auth(Role.CUSTOMER), BillController.getMyBills);
 
 export const BillRoutes = router;

@@ -2,7 +2,7 @@ import { Role } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import httpStatus from "http-status";
-import { ICreateAreaPayload } from "./area.interface";
+import { ICreateAreaPayload, IUpdateAreaPayload } from "./area.interface";
 
 const createArea = async (payload: ICreateAreaPayload) => {
   const { name, collectorId } = payload;
@@ -28,11 +28,64 @@ const createArea = async (payload: ICreateAreaPayload) => {
   return area;
 };
 
+const updatedAreaCollector = async (payload: IUpdateAreaPayload, areaId: string) => {
+  const {  collectorId } = payload;
+
+  const isCollectorExist = await prisma.user.findUnique({
+    where: {
+      id: collectorId,
+      role: Role.COLLECTOR,
+    },
+  });
+
+  if (!isCollectorExist) {
+    throw new AppError(httpStatus.CONFLICT, "Collector dose not exist");
+  }
+
+  const isAreaExist = await prisma.area.findUnique({ where: { id: areaId } });
+
+  if (!isAreaExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "Area Dose Not Exist");
+  }
+
+  const updatedArea = await prisma.area.update({
+    where: {
+      id: areaId,
+    },
+    data: {
+      collectorId,
+    },
+  });
+
+  return updatedArea;
+};
+
 const getAllArea = async () => {
   const area = await prisma.area.findMany();
 
   if (!area) {
     throw new AppError(httpStatus.NOT_FOUND, "Area Dose not exist");
+  }
+
+  return area;
+};
+
+const getAreaById = async (areaId: string) => {
+  const area = await prisma.area.findUnique({
+    where: {
+      id: areaId,
+    },
+    include: {
+      collector: true,
+      _count: {
+        select: {
+          customer: true,
+        },
+      },
+    },
+  });
+  if (!area) {
+    throw new AppError(httpStatus.NOT_FOUND, "Area Not Found");
   }
 
   return area;
@@ -53,7 +106,9 @@ const getCollectorArea = async (collectorId: string) => {
 };
 
 export const AreaServices = {
-    createArea,
-    getAllArea,
-    getCollectorArea
-}
+  createArea,
+  getAllArea,
+  getAreaById,
+  getCollectorArea,
+  updatedAreaCollector,
+};

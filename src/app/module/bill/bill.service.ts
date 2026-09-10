@@ -101,6 +101,19 @@ const generateCustomerBill = async (customerId: string) => {
   if (!customer) {
     throw new AppError(httpStatus.NOT_FOUND, "Customer Not Found");
   }
+  const isBillExist = await prisma.bill.findUnique({
+    where:{
+      customerId_month_year: {
+      customerId:customer.id,
+      month,
+      year,
+    }
+    }
+  })
+
+  if(isBillExist){
+    throw new AppError(httpStatus.CONFLICT,"This Bill Already Exist")
+  }
 
   const bill = await prisma.bill.create({
     data: {
