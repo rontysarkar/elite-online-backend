@@ -17,6 +17,20 @@ const createCollectorAccount = catchAsync(
   },
 );
 
+const getAllCollector = catchAsync(
+  async (req: Request, res: Response) => {
+
+    const result = await CollectorServices.getAllCollector();
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Collector Retrieve  Successfully",
+      data: result,
+    });
+  },
+);
+
 export const CollectorController = {
   createCollectorAccount,
+  getAllCollector,
 };

@@ -31,10 +31,10 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
 // app.use("/api/v1/admin", AdminRoutes);
-app.use("/app/v1/collector", CollectorRoutes);
+app.use("/api/v1/collectors", CollectorRoutes);
 app.use("/api/v1/customers", CustomerRoutes);
 app.use("/api/v1/users", UserRoutes);
-app.use("/api/v1/package", PackageRoutes);
+app.use("/api/v1/packages", PackageRoutes);
 app.use("/api/v1/areas", AreaRoutes);
 app.use("/api/v1/bills", BillRoutes);
 app.use("/api/v1/payments", PaymentRoutes);

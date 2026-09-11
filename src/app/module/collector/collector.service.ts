@@ -26,6 +26,8 @@ const createCollectorAccount = async (
   }
 
   const password = crypto.randomBytes(8).toString("hex");
+  // const password = "12345678";
+
   const hashPassword = await bcrypt.hash(
     password,
     Number(config.bcrypt_salt_rounds),
@@ -63,6 +65,25 @@ const createCollectorAccount = async (
   return customer;
 };
 
+const getAllCollector = async () => {
+  const collectors = await prisma.user.findMany({
+    where: {
+      role: Role.COLLECTOR,
+      isDeleted: false,
+    },
+    omit: {
+      password: true,
+    },
+  });
+
+  if (!collectors) {
+    throw new AppError(httpStatus.NOT_FOUND, "Collectors Not Found");
+  }
+
+  return collectors;
+};
+
 export const CollectorServices = {
   createCollectorAccount,
+  getAllCollector,
 };

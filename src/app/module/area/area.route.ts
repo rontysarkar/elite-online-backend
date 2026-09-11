@@ -9,9 +9,9 @@ import { Role } from "../../../generated/prisma/enums";
 const router = Router();
 
 router.post('/',validateRequest(CreateAreaPayloadSchema),auth(Role.ADMIN),AreaController.createArea);
-router.patch('/:areaId/collector',validateRequest(UpdateAreaPayloadSchema),auth(Role.ADMIN),AreaController.updatedAreaCollector)
+router.patch('/:areaId',validateRequest(UpdateAreaPayloadSchema),auth(Role.ADMIN),AreaController.updatedAreaCollector)
 router.get('/',AreaController.getAllArea);
-router.get('/:areaId',AreaController.getAreaById);
 router.get('/my-area',auth(Role.COLLECTOR),AreaController.getCollectorArea)
+router.get('/:areaId',AreaController.getAreaById);
 
 export const AreaRoutes = router;

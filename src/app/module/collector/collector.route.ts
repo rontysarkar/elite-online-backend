@@ -8,9 +8,11 @@ import { CollectorController } from "./collector.controller";
 const router = Router();
 
 router.post(
-  "/create-collector",
+  "/",
   auth(Role.ADMIN),
   validateRequest(CreateCollectorAccountSchema),
   CollectorController.createCollectorAccount,
 );
+
+router.get("/",auth(Role.ADMIN),CollectorController.getAllCollector)
 export const CollectorRoutes = router;

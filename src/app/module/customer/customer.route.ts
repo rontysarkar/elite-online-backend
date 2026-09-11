@@ -8,11 +8,11 @@ import { CustomerController } from "./customer.controller";
 
 const router = Router();
 
-router.post("/create-customer",auth(Role.ADMIN),validateRequest(CreateCustomerAccountSchema), CustomerController.createCustomerAccount);
+router.post("/",auth(Role.ADMIN),validateRequest(CreateCustomerAccountSchema), CustomerController.createCustomerAccount);
+router.patch('/:customerId',auth(Role.ADMIN),validateRequest(UpdateCustomerInfoSchema),CustomerController.updateCustomerInfo)
 router.get('/',auth(Role.ADMIN),CustomerController.getAllCustomers);
 router.get('/my-customers',auth(Role.COLLECTOR),CustomerController.getMyCustomers);
-router.get('/:customerId',auth(Role.ADMIN),CustomerController.getCustomerById);
-router.patch('/:customerId',auth(Role.ADMIN),validateRequest(UpdateCustomerInfoSchema),CustomerController.updateCustomerInfo)
+router.get('/:customerId',auth(Role.ADMIN,Role.COLLECTOR),CustomerController.getCustomerById);
 
 
 export const CustomerRoutes = router;

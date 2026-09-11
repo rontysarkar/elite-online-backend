@@ -48,6 +48,10 @@ const updatedAreaCollector = async (payload: IUpdateAreaPayload, areaId: string)
     throw new AppError(httpStatus.NOT_FOUND, "Area Dose Not Exist");
   }
 
+  if(isCollectorExist.id === isAreaExist.collectorId){
+    throw new AppError(httpStatus.BAD_REQUEST,"Already Assign This collector for this area")
+  }
+
   const updatedArea = await prisma.area.update({
     where: {
       id: areaId,
@@ -55,13 +59,36 @@ const updatedAreaCollector = async (payload: IUpdateAreaPayload, areaId: string)
     data: {
       collectorId,
     },
+    include:{
+      collector:{
+        select:{
+          id:true,
+          name:true
+        }
+      }
+    }
   });
 
   return updatedArea;
 };
 
 const getAllArea = async () => {
-  const area = await prisma.area.findMany();
+  const area = await prisma.area.findMany({
+    include:{
+      collector:{
+        select:{
+          id:true,
+          name:true,
+
+        }
+      },
+      _count:{
+        select:{
+          customer:true,
+        }
+      }
+    }
+  });
 
   if (!area) {
     throw new AppError(httpStatus.NOT_FOUND, "Area Dose not exist");
@@ -76,7 +103,13 @@ const getAreaById = async (areaId: string) => {
       id: areaId,
     },
     include: {
-      collector: true,
+      collector: {
+        select:{
+          id:true,
+          name:true,
+          phone:true
+        }
+      },
       _count: {
         select: {
           customer: true,

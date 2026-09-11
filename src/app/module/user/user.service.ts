@@ -1,6 +1,6 @@
 import { CustomerStatus } from "../../../generated/prisma/enums";
 import { UserWhereInput } from "../../../generated/prisma/models";
-import { IQuery } from "../../interface";
+import { IQuery, IRequestUser } from "../../interface";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import { buildQuery } from "../../utils/queryBuilder";
@@ -16,6 +16,9 @@ const getUsers = async (query: IQuery) => {
   const users = await prisma.user.findMany({
     where: {
       AND: andCondition,
+    },
+    omit:{
+      password:true
     },
     take: limit,
     skip,
@@ -46,6 +49,9 @@ const getUserById = async (userId: string) => {
     where: {
       id: userId,
     },
+    omit:{
+      password:true,
+    }
   });
 
   if (!user) {
@@ -93,8 +99,56 @@ const deleteUserById = async (userId: string) => {
   return deletedUser;
 };
 
+const getMe = async(user:IRequestUser)=>{
+
+  const userInfo = await prisma.user.findUnique({
+    where:{
+      id:user.userId
+    },
+    omit:{
+      password:true,
+    },
+    include:{
+      area:{
+        select:{
+          id:true,
+          name:true,
+        }
+      },
+      customer:{
+        select:{
+          id:true,
+          address:true,
+          package:true,
+          area:{
+            select:{
+              id:true,
+              name:true,
+              collector:{
+                select:{
+                  id:true,
+                  name:true,
+                  phone:true
+                }
+              }
+            }
+          },
+          
+        }
+      }
+    }
+  })
+
+  if(!userInfo){
+    throw new AppError(httpStatus.NOT_FOUND,"User Not Found")
+  }
+
+  return userInfo;
+}
+
 export const UserServices = {
   getUsers,
   getUserById,
   deleteUserById,
+  getMe,
 };
