@@ -74,7 +74,6 @@
 //   return customer;
 // };
 
-
 // const createCollectorAccount = async (payload: ICreateCollectorAccountPayload) => {
 //   const { name, email, phone} = payload;
 
@@ -125,9 +124,6 @@
 
 //   return customer;
 // };
-
-
-
 
 // export const AdminServices = {
 //   createCustomerAccount,

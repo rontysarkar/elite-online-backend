@@ -11,9 +11,9 @@ async function main() {
 		await prisma.$connect();
 		console.log("Database Connect Successfully");
 		await redisClient.connect();
-		console.log("Redis Connect Successfully")
+		console.log("Redis Connect Successfully");
 		await transporter.verify();
-		console.log("Nodemailer Connect Successfully")
+		console.log("Nodemailer Connect Successfully");
 		seedAdmin();
 		seedCollector();
 		app.listen(config.port, () => {

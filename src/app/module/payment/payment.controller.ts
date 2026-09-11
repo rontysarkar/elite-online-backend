@@ -5,55 +5,55 @@ import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 
 const createPaymentByCollector = catchAsync(
-  async (req: Request, res: Response) => {
-    const { billId } = req.body;
-    const user = req.user!;
-    const result = await PaymentServices.createPaymentByCollector(billId, user);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Add Payment Successfully",
-      data: result,
-    });
-  },
+	async (req: Request, res: Response) => {
+		const { billId } = req.body;
+		const user = req.user!;
+		const result = await PaymentServices.createPaymentByCollector(billId, user);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Add Payment Successfully",
+			data: result,
+		});
+	},
 );
 
 const createPaymentByCustomer = catchAsync(
-  async (req: Request, res: Response) => {
-    const { billId } = req.body;
-    const user = req.user!;
-    const result = await PaymentServices.createPaymentByCustomer(billId, user);
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "Create Payment Successfully,Please Payment using bkash payment",
-      data: result,
-    });
-  },
+	async (req: Request, res: Response) => {
+		const { billId } = req.body;
+		const user = req.user!;
+		const result = await PaymentServices.createPaymentByCustomer(billId, user);
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Create Payment Successfully,Please Payment using bkash payment",
+			data: result,
+		});
+	},
 );
 
 const bkashPaymentCallback = catchAsync(async (req: Request, res: Response) => {
-  const { redirectUrl } = await PaymentServices.bkashPaymentCallback(
-    req?.query,
-  );
+	const { redirectUrl } = await PaymentServices.bkashPaymentCallback(
+		req?.query,
+	);
 
-  res.redirect(redirectUrl);
+	res.redirect(redirectUrl);
 });
 
 const getMyPayments = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user!;
-  const result = await PaymentServices.getMyPayments(user);
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "Retrieve Payments Successfully",
-    data: result,
-  });
+	const user = req.user!;
+	const result = await PaymentServices.getMyPayments(user);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Retrieve Payments Successfully",
+		data: result,
+	});
 });
 
 export const PaymentController = {
-  createPaymentByCollector,
-  createPaymentByCustomer,
-  bkashPaymentCallback,
-  getMyPayments,
+	createPaymentByCollector,
+	createPaymentByCustomer,
+	bkashPaymentCallback,
+	getMyPayments,
 };

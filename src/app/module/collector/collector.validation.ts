@@ -3,14 +3,14 @@ import z from "zod";
 const bdPhoneRegex = /^(?:\+8801|8801|01)[3-9]\d{8}$/;
 
 export const CreateCollectorAccountSchema = z.object({
-  name: z.string("Name is required").min(1, "Name cannot be empty"),
-  email: z.email("Invalid email address"),
-  phone: z
-    .string("Phone number is required")
-    .regex(bdPhoneRegex, "Invalid Bangladeshi phone number")
-    .transform((val) => {
-      if (val.startsWith("+88")) return val.slice(3);
-      if (val.startsWith("88")) return val.slice(2);
-      return val;
-    }),
+	name: z.string("Name is required").min(1, "Name cannot be empty"),
+	email: z.email("Invalid email address"),
+	phone: z
+		.string("Phone number is required")
+		.regex(bdPhoneRegex, "Invalid Bangladeshi phone number")
+		.transform((val) => {
+			if (val.startsWith("+88")) return val.slice(3);
+			if (val.startsWith("88")) return val.slice(2);
+			return val;
+		}),
 });

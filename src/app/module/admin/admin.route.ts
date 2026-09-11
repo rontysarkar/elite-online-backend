@@ -5,7 +5,6 @@
 // import { auth } from "../../middleware/checkAuth";
 // import { Role } from "../../../generated/prisma/enums";
 
-
 // const router = Router();
 
 // router.post("/create-customer",auth(Role.ADMIN),validateRequest(CreateCustomerAccountSchema), AdminController.createCustomerAccount);

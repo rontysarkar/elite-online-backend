@@ -3,14 +3,13 @@ export interface ILoginPayload {
 	password: string;
 }
 
-
 export interface IChangePasswordPayload {
-	current_password:string,
-	new_password:string,
+	current_password: string;
+	new_password: string;
 }
 
 export interface IResetPasswordPayload {
-	email:string,
-	new_password:string,
-	otp:string,
+	email: string;
+	new_password: string;
+	otp: string;
 }

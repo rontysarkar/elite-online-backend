@@ -15,7 +15,6 @@
 //   });
 // });
 
-
 // const createCollectorAccount = catchAsync(async (req: Request, res: Response) => {
 //   const payload = req.body;
 //   const result = await AdminServices.createCollectorAccount(payload);
@@ -27,11 +26,8 @@
 //   });
 // });
 
-
-
-
 // export const AdminController = {
 //     createCustomerAccount,
 //     createCollectorAccount,
-    
+
 // }

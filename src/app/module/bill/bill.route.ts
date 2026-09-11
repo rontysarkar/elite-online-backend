@@ -7,35 +7,31 @@ const router = Router();
 
 // admin
 
+router.post("/generate", auth(Role.ADMIN), BillController.generateMonthlyBills);
 router.post(
-  "/generate",
-  auth(Role.ADMIN),
-  BillController.generateMonthlyBills,
-);
-router.post(
-  "/generate/:customerId",
-  auth(Role.ADMIN),
-  BillController.generateCustomerBill,
+	"/generate/:customerId",
+	auth(Role.ADMIN),
+	BillController.generateCustomerBill,
 );
 
 router.get("/", auth(Role.ADMIN), BillController.getBillsByAdmin);
 
 router.get(
-  "/collector/bills",
-  auth(Role.COLLECTOR),
-  BillController.getBillsByCollectorId,
+	"/collector/bills",
+	auth(Role.COLLECTOR),
+	BillController.getBillsByCollectorId,
 );
 
 router.get(
-  "/:billId",
-  auth(Role.ADMIN, Role.COLLECTOR),
-  BillController.getBillById,
+	"/:billId",
+	auth(Role.ADMIN, Role.COLLECTOR),
+	BillController.getBillById,
 );
 
 router.get(
-  "/customer/my-bills",
-  auth(Role.CUSTOMER),
-  BillController.getMyBills,
+	"/customer/my-bills",
+	auth(Role.CUSTOMER),
+	BillController.getMyBills,
 );
 
 export const BillRoutes = router;

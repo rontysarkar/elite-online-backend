@@ -18,10 +18,10 @@ import { CustomerRoutes } from "./app/module/customer/customer.route";
 const app: Application = express();
 
 app.use(
-  cors({
-    origin: config.frontend_url,
-    credentials: true,
-  }),
+	cors({
+		origin: config.frontend_url,
+		credentials: true,
+	}),
 );
 
 app.use(express.urlencoded({ extended: true }));
@@ -43,10 +43,10 @@ app.use("/api/v1/connection-request", CreateConnectionRequestRoutes);
 
 // Basic route
 app.get("/", async (_req: Request, res: Response) => {
-  res.status(202).json({
-    success: true,
-    message: "Welcome to Elite Online",
-  });
+	res.status(202).json({
+		success: true,
+		message: "Welcome to Elite Online",
+	});
 });
 
 app.use(globalErrorHandler);

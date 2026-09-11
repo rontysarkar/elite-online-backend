@@ -5,70 +5,67 @@ import httpStatus from "http-status";
 import { ConnectionRequestServices } from "./connection-request.service";
 
 const createConnectionRequest = catchAsync(
-  async (req: Request, res: Response) => {
-    const payload = req.body;
-    const result =
-      await ConnectionRequestServices.createConnectionRequest(payload);
+	async (req: Request, res: Response) => {
+		const payload = req.body;
+		const result =
+			await ConnectionRequestServices.createConnectionRequest(payload);
 
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: "An OTP has been sent to your email. Please check and verify.",
-      data: result,
-    });
-  },
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "An OTP has been sent to your email. Please check and verify.",
+			data: result,
+		});
+	},
 );
 
 const requestedEmailVerify = catchAsync(async (req: Request, res: Response) => {
-  const { email, otp } = req.body;
-  const result = await ConnectionRequestServices.requestedEmailVerify(
-    email,
-    String(otp),
-  );
+	const { email, otp } = req.body;
+	const result = await ConnectionRequestServices.requestedEmailVerify(
+		email,
+		String(otp),
+	);
 
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message:
-      "Your connection request has been accepted. Our team will get in touch with you very soon.",
-    data: result,
-  });
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message:
+			"Your connection request has been accepted. Our team will get in touch with you very soon.",
+		data: result,
+	});
 });
 
 const acceptConnectionRequest = catchAsync(
-  async (req: Request, res: Response) => {
-    const { requestedId } = req.params;
-    const result = await ConnectionRequestServices.acceptConnectionRequest(
-      requestedId as string,
-    );
+	async (req: Request, res: Response) => {
+		const { requestedId } = req.params;
+		const result = await ConnectionRequestServices.acceptConnectionRequest(
+			requestedId as string,
+		);
 
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message:
-        "Customer Account Created Successfully",
-      data: result,
-    });
-  },
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Customer Account Created Successfully",
+			data: result,
+		});
+	},
 );
 
 const getAllConnectionRequest = catchAsync(
-  async (req: Request, res: Response) => {
-   
-    const result = await ConnectionRequestServices.getAllConnectionRequest();
-    sendResponse(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message:
-        "Connection Request Retrieve Successfully",
-      data: result,
-    });
-  },
+	async (req: Request, res: Response) => {
+		const result = await ConnectionRequestServices.getAllConnectionRequest();
+		sendResponse(res, {
+			success: true,
+			statusCode: httpStatus.OK,
+			message: "Connection Request Retrieve Successfully",
+			data: result,
+		});
+	},
 );
 
 export const ConnectionRequestController = {
-  createConnectionRequest,
-  requestedEmailVerify,
-  acceptConnectionRequest,
-  getAllConnectionRequest,
+	createConnectionRequest,
+	requestedEmailVerify,
+	acceptConnectionRequest,
+	getAllConnectionRequest,
 };

@@ -7,8 +7,22 @@ import { CreatePaymentByCollectorSchema } from "./payment.validation";
 
 const router = Router();
 
-router.post('/collector',validateRequest(CreatePaymentByCollectorSchema),auth(Role.COLLECTOR),PaymentController.createPaymentByCollector);
-router.post('/bkash',validateRequest(CreatePaymentByCollectorSchema),auth(Role.CUSTOMER),PaymentController.createPaymentByCustomer)
-router.get('/bkash-callback',PaymentController.bkashPaymentCallback);
-router.get('/my-payments',auth(Role.CUSTOMER),PaymentController.getMyPayments)
+router.post(
+	"/collector",
+	validateRequest(CreatePaymentByCollectorSchema),
+	auth(Role.COLLECTOR),
+	PaymentController.createPaymentByCollector,
+);
+router.post(
+	"/bkash",
+	validateRequest(CreatePaymentByCollectorSchema),
+	auth(Role.CUSTOMER),
+	PaymentController.createPaymentByCustomer,
+);
+router.get("/bkash-callback", PaymentController.bkashPaymentCallback);
+router.get(
+	"/my-payments",
+	auth(Role.CUSTOMER),
+	PaymentController.getMyPayments,
+);
 export const PaymentRoutes = router;

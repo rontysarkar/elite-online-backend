@@ -1,4 +1,3 @@
-
 // export interface ICreateCustomerAccountPayload {
 //   name: string;
 //   email: string;
@@ -7,7 +6,6 @@
 //   areaId: string;
 //   packageId: string;
 // }
-
 
 // export interface ICreateCollectorAccountPayload {
 //   name: string;

@@ -18,8 +18,6 @@
 //   packageId: z.string("Package ID is required"),
 // });
 
-
-
 // export const CreateCollectorAccountSchema = z.object({
 //   name: z.string("Name is required").min(1, "Name cannot be empty"),
 //   email: z.email("Invalid email address"),

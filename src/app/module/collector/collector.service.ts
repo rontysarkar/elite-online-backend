@@ -11,79 +11,79 @@ import { transporter } from "../../lib/nodemailer";
 import { ICreateCollectorAccountPayload } from "./collector.interface";
 
 const createCollectorAccount = async (
-  payload: ICreateCollectorAccountPayload,
+	payload: ICreateCollectorAccountPayload,
 ) => {
-  const { name, email, phone } = payload;
+	const { name, email, phone } = payload;
 
-  const isUserExist = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+	const isUserExist = await prisma.user.findUnique({
+		where: {
+			email,
+		},
+	});
 
-  if (isUserExist) {
-    throw new AppError(httpStatus.CONFLICT, "User Already Exist");
-  }
+	if (isUserExist) {
+		throw new AppError(httpStatus.CONFLICT, "User Already Exist");
+	}
 
-  const password = crypto.randomBytes(8).toString("hex");
-  // const password = "12345678";
+	const password = crypto.randomBytes(8).toString("hex");
+	// const password = "12345678";
 
-  const hashPassword = await bcrypt.hash(
-    password,
-    Number(config.bcrypt_salt_rounds),
-  );
+	const hashPassword = await bcrypt.hash(
+		password,
+		Number(config.bcrypt_salt_rounds),
+	);
 
-  const customer = await prisma.user.create({
-    data: {
-      name,
-      email,
-      phone,
-      password: hashPassword,
-      role: Role.COLLECTOR,
-    },
-    omit: {
-      password: true,
-    },
-  });
+	const customer = await prisma.user.create({
+		data: {
+			name,
+			email,
+			phone,
+			password: hashPassword,
+			role: Role.COLLECTOR,
+		},
+		omit: {
+			password: true,
+		},
+	});
 
-  const html = await ejs.renderFile(
-    path.join(process.cwd(), "src/app/templates/account-created.ejs"),
-    {
-      userName: name,
-      userEmail: email,
-      tempPassword: password,
-    },
-  );
+	const html = await ejs.renderFile(
+		path.join(process.cwd(), "src/app/templates/account-created.ejs"),
+		{
+			userName: name,
+			userEmail: email,
+			tempPassword: password,
+		},
+	);
 
-  await transporter.sendMail({
-    from: config.smtp_sender_email,
-    to: email,
-    subject: "Your Elite Online Account Has Been Created!",
-    html: html,
-  });
+	await transporter.sendMail({
+		from: config.smtp_sender_email,
+		to: email,
+		subject: "Your Elite Online Account Has Been Created!",
+		html: html,
+	});
 
-  return customer;
+	return customer;
 };
 
 const getAllCollector = async () => {
-  const collectors = await prisma.user.findMany({
-    where: {
-      role: Role.COLLECTOR,
-      isDeleted: false,
-    },
-    omit: {
-      password: true,
-    },
-  });
+	const collectors = await prisma.user.findMany({
+		where: {
+			role: Role.COLLECTOR,
+			isDeleted: false,
+		},
+		omit: {
+			password: true,
+		},
+	});
 
-  if (!collectors) {
-    throw new AppError(httpStatus.NOT_FOUND, "Collectors Not Found");
-  }
+	if (!collectors) {
+		throw new AppError(httpStatus.NOT_FOUND, "Collectors Not Found");
+	}
 
-  return collectors;
+	return collectors;
 };
 
 export const CollectorServices = {
-  createCollectorAccount,
-  getAllCollector,
+	createCollectorAccount,
+	getAllCollector,
 };

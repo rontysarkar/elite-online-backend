@@ -1,7 +1,11 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { IChangePasswordPayload, ILoginPayload, IResetPasswordPayload } from "./auth.interface";
+import {
+	IChangePasswordPayload,
+	ILoginPayload,
+	IResetPasswordPayload,
+} from "./auth.interface";
 import httpStatus from "http-status";
 import { jwtUtils } from "../../utils/jwt";
 import config from "../../config";
@@ -14,219 +18,218 @@ import ejs from "ejs";
 import path from "path";
 
 const loginUser = async (payload: ILoginPayload) => {
-  const { password } = payload;
-  const email = payload.email.trim().toLowerCase();
+	const { password } = payload;
+	const email = payload.email.trim().toLowerCase();
 
-  const isUserExist = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+	const isUserExist = await prisma.user.findUnique({
+		where: {
+			email,
+		},
+	});
 
-  if (!isUserExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
-  }
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+	}
 
-  if (isUserExist.isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, "User Is Deleted");
-  }
+	if (isUserExist.isDeleted) {
+		throw new AppError(httpStatus.FORBIDDEN, "User Is Deleted");
+	}
 
-  const isPasswordMatch = await bcrypt.compare(
-    password,
-    isUserExist.password as string,
-  );
+	const isPasswordMatch = await bcrypt.compare(
+		password,
+		isUserExist.password as string,
+	);
 
-  if (!isPasswordMatch) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid Credentials");
-  }
+	if (!isPasswordMatch) {
+		throw new AppError(httpStatus.UNAUTHORIZED, "Invalid Credentials");
+	}
 
-  const jwtPayload = {
-    userId: isUserExist.id,
-    name: isUserExist.name,
-    email: isUserExist.email,
-    role: isUserExist.role,
-  };
+	const jwtPayload = {
+		userId: isUserExist.id,
+		name: isUserExist.name,
+		email: isUserExist.email,
+		role: isUserExist.role,
+	};
 
-  const accessToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as SignOptions,
-  );
+	const accessToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_access_secret as string,
+		config.jwt_access_expires_in as SignOptions,
+	);
 
-  const refreshToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as SignOptions,
-  );
+	const refreshToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_refresh_secret as string,
+		config.jwt_refresh_expires_in as SignOptions,
+	);
 
-  return {
-    accessToken,
-    refreshToken,
-  };
+	return {
+		accessToken,
+		refreshToken,
+	};
 };
 
 const createAccessToken = async (token: string) => {
-  const verifyToken = jwtUtils.verifyToken(
-    token as string,
-    config.jwt_refresh_secret as string,
-  );
-  if(!verifyToken?.success){
-    throw new AppError(httpStatus.FORBIDDEN,"Token Invalid")
-  }
+	const verifyToken = jwtUtils.verifyToken(
+		token as string,
+		config.jwt_refresh_secret as string,
+	);
+	if (!verifyToken?.success) {
+		throw new AppError(httpStatus.FORBIDDEN, "Token Invalid");
+	}
 
-  const { data } = verifyToken as JwtPayload;
+	const { data } = verifyToken as JwtPayload;
 
-  const isUserExist = await prisma.user.findUnique({
-    where: {
-      id:data.userId,
-    },
-  });
+	const isUserExist = await prisma.user.findUnique({
+		where: {
+			id: data.userId,
+		},
+	});
 
-  if (!isUserExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
-  }
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+	}
 
-  if (isUserExist.isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, "User Is Deleted");
-  }
+	if (isUserExist.isDeleted) {
+		throw new AppError(httpStatus.FORBIDDEN, "User Is Deleted");
+	}
 
+	const jwtPayload = {
+		userId: isUserExist.id,
+		name: isUserExist.name,
+		email: isUserExist.email,
+		role: isUserExist.role,
+	};
 
-  const jwtPayload = {
-    userId: isUserExist.id,
-    name: isUserExist.name,
-    email: isUserExist.email,
-    role: isUserExist.role,
-  };
+	const accessToken = jwtUtils.createToken(
+		jwtPayload,
+		config.jwt_access_secret as string,
+		config.jwt_access_expires_in as SignOptions,
+	);
 
-  const accessToken = jwtUtils.createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as SignOptions,
-  );
-
-  return {accessToken}
+	return { accessToken };
 };
 
 const changePassword = async (
-  payload: IChangePasswordPayload,
-  user: IRequestUser,
+	payload: IChangePasswordPayload,
+	user: IRequestUser,
 ) => {
-  const { current_password, new_password } = payload;
+	const { current_password, new_password } = payload;
 
-  const isUserExist = await prisma.user.findUnique({
-    where: {
-      id: user.userId,
-    },
-  });
+	const isUserExist = await prisma.user.findUnique({
+		where: {
+			id: user.userId,
+		},
+	});
 
-  if (!isUserExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
-  }
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
+	}
 
-  const isMatchPassword = await bcrypt.compare(
-    current_password,
-    isUserExist.password,
-  );
-  if (!isMatchPassword) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Incorrect Current Password");
-  }
+	const isMatchPassword = await bcrypt.compare(
+		current_password,
+		isUserExist.password,
+	);
+	if (!isMatchPassword) {
+		throw new AppError(httpStatus.UNAUTHORIZED, "Incorrect Current Password");
+	}
 
-  const hashPassword = await bcrypt.hash(
-    new_password,
-    Number(config.bcrypt_salt_rounds),
-  );
+	const hashPassword = await bcrypt.hash(
+		new_password,
+		Number(config.bcrypt_salt_rounds),
+	);
 
-  await prisma.user.update({
-    where: {
-      id: isUserExist.id,
-    },
-    data: {
-      password: hashPassword,
-    },
-  });
+	await prisma.user.update({
+		where: {
+			id: isUserExist.id,
+		},
+		data: {
+			password: hashPassword,
+		},
+	});
 
-  return null;
+	return null;
 };
 
 const forgotPassword = async (email: string) => {
-  const isUserExist = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+	const isUserExist = await prisma.user.findUnique({
+		where: {
+			email,
+		},
+	});
 
-  if (!isUserExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "User Dose Not Exist");
-  }
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Dose Not Exist");
+	}
 
-  const forgotPasswordOtpKey = `isp-forgot-password-otp:${email}`;
-  const otp = crypto.randomInt(100000, 1000000);
+	const forgotPasswordOtpKey = `isp-forgot-password-otp:${email}`;
+	const otp = crypto.randomInt(100000, 1000000);
 
-  await redisClient.set(forgotPasswordOtpKey, otp, {
-    EX: 60 * 5,
-  });
+	await redisClient.set(forgotPasswordOtpKey, otp, {
+		EX: 60 * 5,
+	});
 
-  const html = await ejs.renderFile(
-    path.join(process.cwd(), "src/app/templates/forgot-password.ejs"),
-    {
-      userName: isUserExist.name,
-      otpCode: otp,
-    },
-  );
+	const html = await ejs.renderFile(
+		path.join(process.cwd(), "src/app/templates/forgot-password.ejs"),
+		{
+			userName: isUserExist.name,
+			otpCode: otp,
+		},
+	);
 
-  transporter.sendMail({
-    from: config.smtp_sender_email,
-    to: email,
-    subject: "Password Reset OTP - Elite Online",
-    html,
-  });
+	await transporter.sendMail({
+		from: config.smtp_sender_email,
+		to: email,
+		subject: "Password Reset OTP - Elite Online",
+		html,
+	});
 };
 
-const setNewPassword = async (payload:IResetPasswordPayload) => {
-  const {email,new_password,otp} = payload
+const setNewPassword = async (payload: IResetPasswordPayload) => {
+	const { email, new_password, otp } = payload;
 
-  const isUserExist = await prisma.user.findUnique({
-    where: {
-      email:email,
-    },
-  });
+	const isUserExist = await prisma.user.findUnique({
+		where: {
+			email: email,
+		},
+	});
 
-  if (!isUserExist) {
-    throw new AppError(httpStatus.NOT_FOUND, "User Dose Not Exist");
-  }
+	if (!isUserExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "User Dose Not Exist");
+	}
 
-  const forgotPasswordOtpKey = `isp-forgot-password-otp:${email}`;
+	const forgotPasswordOtpKey = `isp-forgot-password-otp:${email}`;
 
-  const redisOtp = await redisClient.get(forgotPasswordOtpKey);
-  if (!redisOtp) {
-    throw new AppError(httpStatus.NOT_FOUND, "OTP has been Expire");
-  }
+	const redisOtp = await redisClient.get(forgotPasswordOtpKey);
+	if (!redisOtp) {
+		throw new AppError(httpStatus.NOT_FOUND, "OTP has been Expire");
+	}
 
-  if (redisOtp !== otp) {
-    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid OTP");
-  }
+	if (redisOtp !== otp) {
+		throw new AppError(httpStatus.UNAUTHORIZED, "Invalid OTP");
+	}
 
-  await redisClient.del(forgotPasswordOtpKey);
+	await redisClient.del(forgotPasswordOtpKey);
 
-  const hashPassword = await bcrypt.hash(
-    new_password,
-    Number(config.bcrypt_salt_rounds),
-  );
+	const hashPassword = await bcrypt.hash(
+		new_password,
+		Number(config.bcrypt_salt_rounds),
+	);
 
-  await prisma.user.update({
-    where: {
-      id: isUserExist.id,
-    },
-    data: {
-      password: hashPassword,
-    },
-  });
+	await prisma.user.update({
+		where: {
+			id: isUserExist.id,
+		},
+		data: {
+			password: hashPassword,
+		},
+	});
 };
 
 export const AuthService = {
-  loginUser,
-  createAccessToken,
-  changePassword,
-  forgotPassword,
-  setNewPassword,
+	loginUser,
+	createAccessToken,
+	changePassword,
+	forgotPassword,
+	setNewPassword,
 };

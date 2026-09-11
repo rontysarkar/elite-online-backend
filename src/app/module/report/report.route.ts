@@ -5,15 +5,11 @@ import { ReportController } from "./report.controller";
 
 const router = Router();
 
+router.get("/admin", auth(Role.ADMIN), ReportController.getAdminReport);
 router.get(
-  "/admin",
-  auth(Role.ADMIN),
-  ReportController.getAdminReport,
-);
-router.get(
-  "/collector",
-  auth(Role.COLLECTOR),
-  ReportController.getCollectorReport,
+	"/collector",
+	auth(Role.COLLECTOR),
+	ReportController.getCollectorReport,
 );
 
 export const ReportRoutes = router;

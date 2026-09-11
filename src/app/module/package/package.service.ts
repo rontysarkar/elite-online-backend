@@ -3,7 +3,6 @@ import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import { ICreatePackagePayload } from "./package.interface";
 
-
 const createPackage = async (payload: ICreatePackagePayload) => {
 	const pkg = await prisma.package.create({
 		data: {
@@ -11,18 +10,15 @@ const createPackage = async (payload: ICreatePackagePayload) => {
 		},
 	});
 
-    return pkg;
+	return pkg;
 };
 
-
-const getAllPackage = async()=>{
-    
-    const pkg = await prisma.package.findMany({})
-    return pkg;
-}
-
+const getAllPackage = async () => {
+	const pkg = await prisma.package.findMany({});
+	return pkg;
+};
 
 export const PackageServices = {
-    createPackage,
-    getAllPackage,
-}
+	createPackage,
+	getAllPackage,
+};
