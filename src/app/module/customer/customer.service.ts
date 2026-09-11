@@ -31,8 +31,8 @@ const createCustomerAccount = async (
     throw new AppError(httpStatus.CONFLICT, "User Already Exist");
   }
 
-  // const password = crypto.randomBytes(8).toString("hex");
-  const password = "12345678"
+  const password = crypto.randomBytes(8).toString("hex");
+  // const password = "12345678"
   
   const hashPassword = await bcrypt.hash(
     password,
@@ -64,21 +64,21 @@ const createCustomerAccount = async (
     },
   });
 
-  // const html = await ejs.renderFile(
-  //   path.join(process.cwd(), "src/app/templates/account-created.ejs"),
-  //   {
-  //     userName: name,
-  //     userEmail: email,
-  //     tempPassword: password,
-  //   },
-  // );
+  const html = await ejs.renderFile(
+    path.join(process.cwd(), "src/app/templates/account-created.ejs"),
+    {
+      userName: name,
+      userEmail: email,
+      tempPassword: password,
+    },
+  );
 
-  // await transporter.sendMail({
-  //   from: config.smtp_sender_email,
-  //   to: email,
-  //   subject: "Your Elite Online Account Has Been Created!",
-  //   html: html,
-  // });
+  await transporter.sendMail({
+    from: config.smtp_sender_email,
+    to: email,
+    subject: "Your Elite Online Account Has Been Created!",
+    html: html,
+  });
 
   return customer;
 };

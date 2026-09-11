@@ -9,8 +9,8 @@ export interface IChangePasswordPayload {
 	new_password:string,
 }
 
-export interface ISetNewPasswordPayload {
+export interface IResetPasswordPayload {
 	email:string,
-	newPassword:string,
+	new_password:string,
 	otp:string,
 }

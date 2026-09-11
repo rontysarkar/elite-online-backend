@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
-import { IChangePasswordPayload, ILoginPayload, ISetNewPasswordPayload } from "./auth.interface";
+import { IChangePasswordPayload, ILoginPayload, IResetPasswordPayload } from "./auth.interface";
 import httpStatus from "http-status";
 import { jwtUtils } from "../../utils/jwt";
 import config from "../../config";
@@ -182,8 +182,8 @@ const forgotPassword = async (email: string) => {
   });
 };
 
-const setNewPassword = async (payload:ISetNewPasswordPayload) => {
-  const {email,newPassword,otp} = payload
+const setNewPassword = async (payload:IResetPasswordPayload) => {
+  const {email,new_password,otp} = payload
 
   const isUserExist = await prisma.user.findUnique({
     where: {
@@ -209,7 +209,7 @@ const setNewPassword = async (payload:ISetNewPasswordPayload) => {
   await redisClient.del(forgotPasswordOtpKey);
 
   const hashPassword = await bcrypt.hash(
-    newPassword,
+    new_password,
     Number(config.bcrypt_salt_rounds),
   );
 

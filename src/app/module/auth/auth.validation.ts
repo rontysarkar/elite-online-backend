@@ -20,8 +20,8 @@ export const ForgotPasswordPayloadSchema = z.object({
   email: z.email("Invalid email format"),
 });
 
-export const SetNewPasswordPayloadSchema = z.object({
+export const ResetPasswordPayloadSchema = z.object({
   email:z.email("Invalid Email Format"),
-  newPassword:z.string().min(8,"Password Length At Least 8 Character"),
+  new_password:z.string().min(8,"Password Length At Least 8 Character"),
   otp:z.string(),
 })
