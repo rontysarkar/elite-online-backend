@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { AuthService } from "./auth.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import config from "../../config";
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
 	const payload = req.body;
@@ -11,15 +12,15 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
 	res.cookie("accessToken", accessToken, {
 		httpOnly: true,
-		secure: false,
-		sameSite: "none",
+		secure: config.node_env === "development" ? false : true,
+		sameSite: config.node_env === "development" ? "lax" : "none",
 		maxAge: 1000 * 60 * 60 * 24,
 	});
 
 	res.cookie("refreshToken", refreshToken, {
 		httpOnly: true,
-		secure: false,
-		sameSite: "none",
+		secure: config.node_env === "development" ? false : true,
+		sameSite: config.node_env === "development" ? "lax" : "none",
 		maxAge: 1000 * 60 * 60 * 24 * 7,
 	});
 
@@ -34,14 +35,25 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const logoutUser = catchAsync(async (req: Request, res: Response) => {
+	res.clearCookie("accessToken");
+	res.clearCookie("refreshToken");
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "User Logout Successfully",
+		data: null,
+	});
+});
+
 const createAccessToken = catchAsync(async (req: Request, res: Response) => {
 	const token = req.cookies?.refreshToken;
 	const { accessToken } = await AuthService.createAccessToken(token);
 
 	res.cookie("accessToken", accessToken, {
 		httpOnly: true,
-		secure: false,
-		sameSite: "none",
+		secure: config.node_env === "development" ? false : true,
+		sameSite: config.node_env === "development" ? "lax" : "none",
 		maxAge: 1000 * 60 * 60 * 24 * 7,
 	});
 
@@ -104,6 +116,7 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
 
 export const AuthController = {
 	loginUser,
+	logoutUser,
 	createAccessToken,
 	changePassword,
 	forgotPassword,

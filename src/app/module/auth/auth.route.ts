@@ -12,6 +12,7 @@ import {
 const router = Router();
 
 router.post("/login", AuthController.loginUser);
+router.post("/logout", AuthController.logoutUser);
 router.get(
 	"/me",
 	auth(Role.ADMIN, Role.COLLECTOR, Role.CUSTOMER),
