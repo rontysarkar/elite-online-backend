@@ -91,10 +91,22 @@ const setNewPassword = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+	const user = req.user!;
+	const result = await AuthService.getMe(user);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "User Info Retrieve Successfully",
+		data: result,
+	});
+});
+
 export const AuthController = {
 	loginUser,
 	createAccessToken,
 	changePassword,
 	forgotPassword,
 	setNewPassword,
+	getMe,
 };

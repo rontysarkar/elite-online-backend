@@ -101,54 +101,10 @@ const deleteUserById = async (userId: string) => {
 	return deletedUser;
 };
 
-const getMe = async (user: IRequestUser) => {
-	const userInfo = await prisma.user.findUnique({
-		where: {
-			id: user.userId,
-		},
-		omit: {
-			password: true,
-		},
-		include: {
-			area: {
-				select: {
-					id: true,
-					name: true,
-				},
-			},
-			customer: {
-				select: {
-					id: true,
-					address: true,
-					package: true,
-					area: {
-						select: {
-							id: true,
-							name: true,
-							collector: {
-								select: {
-									id: true,
-									name: true,
-									phone: true,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	});
 
-	if (!userInfo) {
-		throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
-	}
-
-	return userInfo;
-};
 
 export const UserServices = {
 	getUsers,
 	getUserById,
 	deleteUserById,
-	getMe,
 };

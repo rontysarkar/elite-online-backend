@@ -12,6 +12,11 @@ import {
 const router = Router();
 
 router.post("/login", AuthController.loginUser);
+router.get(
+	"/me",
+	auth(Role.ADMIN, Role.COLLECTOR, Role.CUSTOMER),
+	AuthController.getMe,
+);
 router.post("/refresh-token", AuthController.createAccessToken);
 router.patch(
 	"/change-password",
