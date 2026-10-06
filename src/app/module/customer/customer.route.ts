@@ -3,6 +3,7 @@ import { validateRequest } from "../../middleware/validatedRequest";
 import { auth } from "../../middleware/checkAuth";
 import { Role } from "../../../generated/prisma/enums";
 import {
+	ChangeCustomerStatusSchema,
 	CreateCustomerAccountSchema,
 	UpdateCustomerInfoSchema,
 } from "./customer.validation";
@@ -32,6 +33,13 @@ router.get(
 	"/:customerId",
 	auth(Role.ADMIN, Role.COLLECTOR),
 	CustomerController.getCustomerById,
+);
+
+router.patch(
+	"/status/:customerId",
+	validateRequest(ChangeCustomerStatusSchema),
+	auth(Role.ADMIN),
+	CustomerController.changeCustomerStatus,
 );
 
 export const CustomerRoutes = router;

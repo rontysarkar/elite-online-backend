@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { CustomerServices } from "./customer.service";
+import { CustomerStatus } from "../../../generated/prisma/enums";
 
 const createCustomerAccount = catchAsync(
 	async (req: Request, res: Response) => {
@@ -69,10 +70,28 @@ const updateCustomerInfo = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const changeCustomerStatus = catchAsync(async (req: Request, res: Response) => {
+	const { customerId } = req.params;
+	const {status} = req.body;
+
+	const data = await CustomerServices.changeCustomerStatus(
+		customerId as string,
+		status as CustomerStatus,
+	);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Customer Status Updated Successfully",
+		data,
+	});
+});
+
 export const CustomerController = {
 	createCustomerAccount,
 	getAllCustomers,
 	getMyCustomers,
 	getCustomerById,
 	updateCustomerInfo,
+	changeCustomerStatus,
 };

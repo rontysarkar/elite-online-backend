@@ -24,3 +24,7 @@ export const UpdateCustomerInfoSchema = z.object({
 	packageId: z.string().optional(),
 	status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
 });
+
+export const ChangeCustomerStatusSchema = z.object({
+	status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+});

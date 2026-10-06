@@ -1,7 +1,7 @@
 import {
-	PaymentMethod,
-	PaymentStatus,
-	Prisma,
+  PaymentMethod,
+  PaymentStatus,
+  Prisma,
 } from "../../../generated/prisma/client";
 import { IQuery, IRequestUser } from "../../interface";
 import { prisma } from "../../lib/prisma";
@@ -9,352 +9,278 @@ import httpStatus from "http-status";
 import { AppError } from "../../utils/AppError";
 
 const getAdminReport = async (query: IQuery) => {
-	const { month, year, collectorId } = query;
+  const { month, year, collectorId } = query;
 
-	const where: Prisma.BillWhereInput = {};
+  const where: Prisma.BillWhereInput = {};
 
-	// =========================
-	// Month & Year Filter
-	// =========================
+  if (year) {
+    const yearNumber = Number(year);
 
-	if (month && year) {
-		const monthNumber = Number(month);
-		const yearNumber = Number(year);
+    if (!Number.isInteger(yearNumber) || yearNumber < 2000) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Invalid year");
+    }
+    where.year = yearNumber;
+  }
 
-		if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12) {
-			throw new AppError(
-				httpStatus.BAD_REQUEST,
-				"Month must be between 1 and 12",
-			);
-		}
+  if (month) {
+    const monthNumber = Number(month);
 
-		if (!Number.isInteger(yearNumber) || yearNumber < 2000) {
-			throw new AppError(httpStatus.BAD_REQUEST, "Invalid year");
-		}
+    if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Month must be between 1 and 12",
+      );
+    }
 
-		where.month = monthNumber;
-		where.year = yearNumber;
-	}
+    where.month = monthNumber;
+  }
 
-	// =========================
-	// Collector Filter
-	// =========================
+  if (collectorId) {
+    where.customer = {
+      area: {
+        collectorId,
+      },
+    };
+  }
 
-	if (collectorId) {
-		where.customer = {
-			area: {
-				collectorId,
-			},
-		};
-	}
+  const billReport = await prisma.bill.groupBy({
+    by: ["status"],
+    where,
 
-	// =========================
-	// Bill Report
-	// =========================
+    _count: {
+      id: true,
+    },
 
-	const billReport = await prisma.bill.groupBy({
-		by: ["status"],
-		where,
+    _sum: {
+      amount: true,
+    },
+  });
 
-		_count: {
-			id: true,
-		},
+  const paymentMethodReport = await prisma.payment.groupBy({
+    by: ["method"],
 
-		_sum: {
-			amount: true,
-		},
-	});
+    where: {
+      bill: where,
+      status: PaymentStatus.SUCCESS,
+    },
 
-	// =========================
-	// Paid Bill Payment Method
-	// =========================
+    _count: {
+      id: true,
+    },
 
-	const paymentMethodReport = await prisma.payment.groupBy({
-		by: ["method"],
+    _sum: {
+      amount: true,
+    },
+  });
 
-		where: {
-			bill: where,
-			status: PaymentStatus.SUCCESS,
-		},
+  const paidReport = billReport.find((item) => item.status === "PAID");
 
-		_count: {
-			id: true,
-		},
+  const unpaidReport = billReport.find((item) => item.status === "UNPAID");
 
-		_sum: {
-			amount: true,
-		},
-	});
+  const overdueReport = billReport.find((item) => item.status === "OVERDUE");
 
-	// =========================
-	// Find Status Data
-	// =========================
+  const totalBills = billReport.reduce(
+    (total, item) => total + item._count.id,
+    0,
+  );
 
-	const paidReport = billReport.find((item) => item.status === "PAID");
+  const totalBillAmount = billReport.reduce(
+    (total, item) => total + Number(item._sum.amount ?? 0),
+    0,
+  );
 
-	const unpaidReport = billReport.find((item) => item.status === "UNPAID");
+  const paidBills = paidReport?._count.id ?? 0;
 
-	const overdueReport = billReport.find((item) => item.status === "OVERDUE");
+  const paidAmount = Number(paidReport?._sum.amount ?? 0);
 
-	// =========================
-	// Total Bill Calculation
-	// =========================
+  const unpaidBills = unpaidReport?._count.id ?? 0;
 
-	const totalBills = billReport.reduce(
-		(total, item) => total + item._count.id,
-		0,
-	);
+  const unpaidAmount = Number(unpaidReport?._sum.amount ?? 0);
 
-	const totalBillAmount = billReport.reduce(
-		(total, item) => total + Number(item._sum.amount ?? 0),
-		0,
-	);
+  const overdueBills = overdueReport?._count.id ?? 0;
 
-	// =========================
-	// Paid
-	// =========================
+  const overdueAmount = Number(overdueReport?._sum.amount ?? 0);
 
-	const paidBills = paidReport?._count.id ?? 0;
+  const cashReport = paymentMethodReport.find(
+    (item) => item.method === PaymentMethod.CASH_COLLECTOR,
+  );
 
-	const paidAmount = Number(paidReport?._sum.amount ?? 0);
+  const bkashReport = paymentMethodReport.find(
+    (item) => item.method === PaymentMethod.BKASH,
+  );
 
-	// =========================
-	// Unpaid
-	// =========================
+  const cashCollectedBills = cashReport?._count.id ?? 0;
 
-	const unpaidBills = unpaidReport?._count.id ?? 0;
+  const cashCollectedAmount = Number(cashReport?._sum.amount ?? 0);
 
-	const unpaidAmount = Number(unpaidReport?._sum.amount ?? 0);
+  const bkashPaidBills = bkashReport?._count.id ?? 0;
 
-	// =========================
-	// Overdue
-	// =========================
+  const bkashPaidAmount = Number(bkashReport?._sum.amount ?? 0);
 
-	const overdueBills = overdueReport?._count.id ?? 0;
+  const collectionRate =
+    totalBillAmount > 0
+      ? Number(((paidAmount / totalBillAmount) * 100).toFixed(2))
+      : 0;
 
-	const overdueAmount = Number(overdueReport?._sum.amount ?? 0);
+  return {
+    totalBills,
+    totalBillAmount,
 
-	// =========================
-	// Cash & Bkash
-	// =========================
+    paidBills,
+    paidAmount,
+    paidMethod: {
+      cashCollectedBills,
+      cashCollectedAmount,
 
-	const cashReport = paymentMethodReport.find(
-		(item) => item.method === PaymentMethod.CASH_COLLECTOR,
-	);
+      bkashPaidBills,
+      bkashPaidAmount,
+    },
 
-	const bkashReport = paymentMethodReport.find(
-		(item) => item.method === PaymentMethod.BKASH,
-	);
+    unpaidBills,
+    unpaidAmount,
 
-	const cashCollectedBills = cashReport?._count.id ?? 0;
-
-	const cashCollectedAmount = Number(cashReport?._sum.amount ?? 0);
-
-	const bkashPaidBills = bkashReport?._count.id ?? 0;
-
-	const bkashPaidAmount = Number(bkashReport?._sum.amount ?? 0);
-
-	const collectionRate =
-		totalBillAmount > 0
-			? Number(((paidAmount / totalBillAmount) * 100).toFixed(2))
-			: 0;
-
-	return {
-		totalBills,
-		totalBillAmount,
-
-		paidBills,
-		paidAmount,
-		paidMethod: {
-			cashCollectedBills,
-			cashCollectedAmount,
-
-			bkashPaidBills,
-			bkashPaidAmount,
-		},
-
-		unpaidBills,
-		unpaidAmount,
-
-		overdueBills,
-		overdueAmount,
-		collectionRate,
-	};
+    overdueBills,
+    overdueAmount,
+    collectionRate,
+  };
 };
 
 const getCollectorReport = async (query: IQuery, user: IRequestUser) => {
-	const { month, year } = query;
+  const { month, year } = query;
 
-	const where: Prisma.BillWhereInput = {};
+  const where: Prisma.BillWhereInput = {};
 
-	// =========================
-	// Month & Year Filter
-	// =========================
+  if (year) {
+    const yearNumber = Number(year);
 
-	if (month && year) {
-		const monthNumber = Number(month);
-		const yearNumber = Number(year);
+    if (!Number.isInteger(yearNumber) || yearNumber < 2000) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Invalid year");
+    }
+    where.year = yearNumber;
+  }
 
-		if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12) {
-			throw new AppError(
-				httpStatus.BAD_REQUEST,
-				"Month must be between 1 and 12",
-			);
-		}
+  if (month) {
+    const monthNumber = Number(month);
 
-		if (!Number.isInteger(yearNumber) || yearNumber < 2000) {
-			throw new AppError(httpStatus.BAD_REQUEST, "Invalid year");
-		}
+    if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Month must be between 1 and 12",
+      );
+    }
 
-		where.month = monthNumber;
-		where.year = yearNumber;
-	}
+    where.month = monthNumber;
+  }
 
-	// =========================
-	// Collector Filter
-	// =========================
+  where.customer = {
+    area: {
+      collectorId: user?.userId,
+    },
+  };
 
-	where.customer = {
-		area: {
-			collectorId: user?.userId,
-		},
-	};
+  const billReport = await prisma.bill.groupBy({
+    by: ["status"],
+    where,
 
-	// =========================
-	// Bill Report
-	// =========================
+    _count: {
+      id: true,
+    },
 
-	const billReport = await prisma.bill.groupBy({
-		by: ["status"],
-		where,
+    _sum: {
+      amount: true,
+    },
+  });
 
-		_count: {
-			id: true,
-		},
+  const paymentMethodReport = await prisma.payment.groupBy({
+    by: ["method"],
 
-		_sum: {
-			amount: true,
-		},
-	});
+    where: {
+      bill: where,
+      status: PaymentStatus.SUCCESS,
+    },
 
-	// =========================
-	// Paid Bill Payment Method
-	// =========================
+    _count: {
+      id: true,
+    },
 
-	const paymentMethodReport = await prisma.payment.groupBy({
-		by: ["method"],
+    _sum: {
+      amount: true,
+    },
+  });
 
-		where: {
-			bill: where,
-			status: PaymentStatus.SUCCESS,
-		},
+  const paidReport = billReport.find((item) => item.status === "PAID");
 
-		_count: {
-			id: true,
-		},
+  const unpaidReport = billReport.find((item) => item.status === "UNPAID");
 
-		_sum: {
-			amount: true,
-		},
-	});
+  const overdueReport = billReport.find((item) => item.status === "OVERDUE");
 
-	// =========================
-	// Find Status Data
-	// =========================
+  const totalBills = billReport.reduce(
+    (total, item) => total + item._count.id,
+    0,
+  );
 
-	const paidReport = billReport.find((item) => item.status === "PAID");
+  const totalBillAmount = billReport.reduce(
+    (total, item) => total + Number(item._sum.amount ?? 0),
+    0,
+  );
 
-	const unpaidReport = billReport.find((item) => item.status === "UNPAID");
+  const paidBills = paidReport?._count.id ?? 0;
 
-	const overdueReport = billReport.find((item) => item.status === "OVERDUE");
+  const paidAmount = Number(paidReport?._sum.amount ?? 0);
 
-	// =========================
-	// Total Bill Calculation
-	// =========================
+  const unpaidBills = unpaidReport?._count.id ?? 0;
 
-	const totalBills = billReport.reduce(
-		(total, item) => total + item._count.id,
-		0,
-	);
+  const unpaidAmount = Number(unpaidReport?._sum.amount ?? 0);
 
-	const totalBillAmount = billReport.reduce(
-		(total, item) => total + Number(item._sum.amount ?? 0),
-		0,
-	);
+  const overdueBills = overdueReport?._count.id ?? 0;
 
-	// =========================
-	// Paid
-	// =========================
+  const overdueAmount = Number(overdueReport?._sum.amount ?? 0);
 
-	const paidBills = paidReport?._count.id ?? 0;
+  const cashReport = paymentMethodReport.find(
+    (item) => item.method === PaymentMethod.CASH_COLLECTOR,
+  );
 
-	const paidAmount = Number(paidReport?._sum.amount ?? 0);
+  const bkashReport = paymentMethodReport.find(
+    (item) => item.method === PaymentMethod.BKASH,
+  );
 
-	// =========================
-	// Unpaid
-	// =========================
+  const cashCollectedBills = cashReport?._count.id ?? 0;
 
-	const unpaidBills = unpaidReport?._count.id ?? 0;
+  const cashCollectedAmount = Number(cashReport?._sum.amount ?? 0);
 
-	const unpaidAmount = Number(unpaidReport?._sum.amount ?? 0);
+  const bkashPaidBills = bkashReport?._count.id ?? 0;
 
-	// =========================
-	// Overdue
-	// =========================
+  const bkashPaidAmount = Number(bkashReport?._sum.amount ?? 0);
 
-	const overdueBills = overdueReport?._count.id ?? 0;
+  const collectionRate =
+    totalBillAmount > 0
+      ? Number(((paidAmount / totalBillAmount) * 100).toFixed(2))
+      : 0;
 
-	const overdueAmount = Number(overdueReport?._sum.amount ?? 0);
+  return {
+    totalBills,
+    totalBillAmount,
 
-	// =========================
-	// Cash & Bkash
-	// =========================
+    paidBills,
+    paidAmount,
+    paidMethod: {
+      cashCollectedBills,
+      cashCollectedAmount,
 
-	const cashReport = paymentMethodReport.find(
-		(item) => item.method === PaymentMethod.CASH_COLLECTOR,
-	);
+      bkashPaidBills,
+      bkashPaidAmount,
+    },
 
-	const bkashReport = paymentMethodReport.find(
-		(item) => item.method === PaymentMethod.BKASH,
-	);
+    unpaidBills,
+    unpaidAmount,
 
-	const cashCollectedBills = cashReport?._count.id ?? 0;
-
-	const cashCollectedAmount = Number(cashReport?._sum.amount ?? 0);
-
-	const bkashPaidBills = bkashReport?._count.id ?? 0;
-
-	const bkashPaidAmount = Number(bkashReport?._sum.amount ?? 0);
-
-	const collectionRate =
-		totalBillAmount > 0
-			? Number(((paidAmount / totalBillAmount) * 100).toFixed(2))
-			: 0;
-
-	return {
-		totalBills,
-		totalBillAmount,
-
-		paidBills,
-		paidAmount,
-		paidMethod: {
-			cashCollectedBills,
-			cashCollectedAmount,
-
-			bkashPaidBills,
-			bkashPaidAmount,
-		},
-
-		unpaidBills,
-		unpaidAmount,
-
-		overdueBills,
-		overdueAmount,
-		collectionRate,
-	};
+    overdueBills,
+    overdueAmount,
+    collectionRate,
+  };
 };
 
 export const ReportServices = {
-	getAdminReport,
-	getCollectorReport,
+  getAdminReport,
+  getCollectorReport,
 };

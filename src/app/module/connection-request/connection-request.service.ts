@@ -74,6 +74,50 @@ const createConnectionRequest = async (
 	return null;
 };
 
+const resendEmailVerify = async (email: string) => {
+	const isEmailExist = await prisma.connectionRequest.findUnique({
+		where: {
+			email,
+		},
+	});
+
+	if (!isEmailExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "Email Not Found");
+	}
+
+	if(isEmailExist.emailVerified){
+		throw new AppError(httpStatus.CONFLICT, "Email Already Verified");
+	}
+
+	const requestEmailVerifyOtpKey = `isp-request-email-verify-otp:${email}`;
+
+	
+	const otp = crypto.randomInt(100000, 1000000);
+
+	await redisClient.set(requestEmailVerifyOtpKey, otp, {
+		EX: 60 * 5,
+	});
+
+	const html = await ejs.renderFile(
+		path.join(process.cwd(), "src/app/templates/verify-email.ejs"),
+		{
+			userName: isEmailExist.name,
+			otpCode: otp,
+		},
+	);
+
+	const nodemailerOptions = {
+		from: config.smtp_sender_email,
+		to: email,
+		subject: "Verify Your Email Address",
+		html,
+	};
+
+	await transporter.sendMail(nodemailerOptions);
+
+	return null;
+};
+
 const requestedEmailVerify = async (email: string, otp: string) => {
 	const isEmailExist = await prisma.connectionRequest.findUnique({
 		where: {
@@ -214,4 +258,5 @@ export const ConnectionRequestServices = {
 	requestedEmailVerify,
 	acceptConnectionRequest,
 	getAllConnectionRequest,
+	resendEmailVerify,
 };

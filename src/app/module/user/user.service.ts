@@ -1,6 +1,6 @@
 import { CustomerStatus } from "../../../generated/prisma/enums";
 import { UserWhereInput } from "../../../generated/prisma/models";
-import { IQuery, IRequestUser } from "../../interface";
+import { IQuery } from "../../interface";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/AppError";
 import { buildQuery } from "../../utils/queryBuilder";
@@ -9,9 +9,38 @@ import httpStatus from "http-status";
 const getUsers = async (query: IQuery) => {
 	const { limit, page, skip, sortBy, sortOrder } = buildQuery(query);
 
-	console.log(limit, page, skip, sortBy, sortOrder);
-
 	const andCondition: UserWhereInput[] = [];
+
+	if(query.searchTerm){
+		andCondition.push({
+			OR: [
+				{
+					email: {
+						contains: query.searchTerm,
+						mode: "insensitive",
+					},
+				},
+				{
+					name: {
+						contains: query.searchTerm,
+						mode: "insensitive",
+					},
+				},
+				{
+					phone: {
+						contains: query.searchTerm,
+						mode: "insensitive",
+					},
+				},
+        ]
+		});
+	}
+
+	if(query.role){
+		andCondition.push({
+			role: query.role,
+		});
+	}
 
 	const users = await prisma.user.findMany({
 		where: {
@@ -33,8 +62,29 @@ const getUsers = async (query: IQuery) => {
 		},
 	});
 
+	const totalUsers = await prisma.user.count();
+
+	const activeUsers = await prisma.user.count({
+		where: {
+			isDeleted: false,
+		},
+	});
+
+	const deletedUsers = await prisma.user.count({
+		where: {
+			isDeleted: true,
+		},
+	});
+
+	const data = {
+		totalUsers,
+		activeUsers,
+		deletedUsers,
+		users
+	}
+
 	return {
-		users,
+		data,
 		meta: {
 			page,
 			limit,
@@ -75,6 +125,10 @@ const deleteUserById = async (userId: string) => {
 		throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
 	}
 
+	if(user.isDeleted){
+		throw new AppError(httpStatus.BAD_REQUEST, "User Already Deleted");
+	}
+
 	const deletedUser = user?.customer
 		? await prisma.user.update({
 				where: {
@@ -88,6 +142,9 @@ const deleteUserById = async (userId: string) => {
 						},
 					},
 				},
+				omit: {
+					password: true,
+				},
 			})
 		: await prisma.user.update({
 				where: {
@@ -95,6 +152,9 @@ const deleteUserById = async (userId: string) => {
 				},
 				data: {
 					isDeleted: true,
+				},
+				omit: {
+					password: true,
 				},
 			});
 

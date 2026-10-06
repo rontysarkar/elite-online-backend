@@ -19,6 +19,18 @@ const createConnectionRequest = catchAsync(
 	},
 );
 
+const resendEmailVerify = catchAsync(async (req: Request, res: Response) => {
+	const { email } = req.body;
+	const result = await ConnectionRequestServices.resendEmailVerify(email);
+
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "An OTP has been sent to your email. Please check and verify.",
+		data: result,
+	});
+});
+
 const requestedEmailVerify = catchAsync(async (req: Request, res: Response) => {
 	const { email, otp } = req.body;
 	const result = await ConnectionRequestServices.requestedEmailVerify(
@@ -68,4 +80,5 @@ export const ConnectionRequestController = {
 	requestedEmailVerify,
 	acceptConnectionRequest,
 	getAllConnectionRequest,
+	resendEmailVerify,
 };

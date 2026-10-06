@@ -6,12 +6,12 @@ import { UserServices } from "./user.service";
 
 const getUsers = catchAsync(async (req: Request, res: Response) => {
 	const query = req.query;
-	const { users, meta } = await UserServices.getUsers(query);
+	const { data, meta } = await UserServices.getUsers(query);
 	sendResponse(res, {
 		success: true,
 		statusCode: httpStatus.OK,
 		message: "Users Retrieve Successfully",
-		data: users,
+		data: data,
 		meta,
 	});
 });

@@ -10,7 +10,7 @@ import ejs from "ejs";
 import path from "path";
 import httpStatus from "http-status";
 import config from "../../config";
-import { Role } from "../../../generated/prisma/enums";
+import { CustomerStatus, Role } from "../../../generated/prisma/enums";
 import { transporter } from "../../lib/nodemailer";
 import { Prisma } from "../../../generated/prisma/client";
 import { IQuery, IRequestUser } from "../../interface";
@@ -88,7 +88,6 @@ const getAllCustomers = async (query: IQuery) => {
 
 	const andConditions: Prisma.CustomerWhereInput[] = [];
 
-	// Search
 	if (query.searchTerm) {
 		andConditions.push({
 			OR: [
@@ -116,10 +115,24 @@ const getAllCustomers = async (query: IQuery) => {
 		});
 	}
 
-	// Area filter
+	
 	if (query.areaId) {
 		andConditions.push({
 			areaId: query.areaId,
+		});
+	}
+
+	if(query.collectorId){
+		andConditions.push({
+			area: {
+				collectorId: query.collectorId,
+			},
+		});	
+	}
+
+	if(query.status){
+		andConditions.push({
+			status: query.status,
 		});
 	}
 
@@ -138,9 +151,6 @@ const getAllCustomers = async (query: IQuery) => {
 		include: {
 			user: {
 				select: {
-					id: true,
-					name: true,
-					email: true,
 					phone: true,
 				},
 			},
@@ -149,15 +159,9 @@ const getAllCustomers = async (query: IQuery) => {
 				select: {
 					id: true,
 					name: true,
-
-					collector: {
-						select: {
-							id: true,
-							name: true,
-						},
-					},
 				},
 			},
+			package: true,
 		},
 
 		orderBy: {
@@ -169,6 +173,18 @@ const getAllCustomers = async (query: IQuery) => {
 		where,
 	});
 
+	const totalCustomers = await prisma.customer.count();
+	const activeCustomers = await prisma.customer.count({
+		where: {
+			status: CustomerStatus.ACTIVE,
+		},
+	});
+	const inactiveCustomers = await prisma.customer.count({
+		where: {
+			status: CustomerStatus.INACTIVE,
+		},
+	});
+
 	return {
 		meta: {
 			page,
@@ -177,7 +193,12 @@ const getAllCustomers = async (query: IQuery) => {
 			totalPage: Math.ceil(total / limit),
 		},
 
-		data: customers,
+		data: {
+			totalCustomers,
+			activeCustomers,
+			inactiveCustomers,
+			customers,
+		},
 	};
 };
 
@@ -381,10 +402,46 @@ const updateCustomerInfo = async (
 	return updatedCustomer;
 };
 
+
+const changeCustomerStatus = async (customerId: string, status: CustomerStatus) => {
+	const isCustomerExist = await prisma.customer.findUnique({
+		where: {
+			id: customerId,
+		},
+		include:{
+			user: true,
+		}
+	});
+
+	if (!isCustomerExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "Customer Not Found");
+	}
+
+	if(isCustomerExist.user.isDeleted){	
+		throw new AppError(httpStatus.FORBIDDEN, "Customer Is Deleted");
+	}
+
+	if(status === isCustomerExist.status){
+		throw new AppError(httpStatus.BAD_REQUEST, `Customer Status Already ${status}`);
+	}
+
+	const updatedCustomer = await prisma.customer.update({
+		where: {
+			id: customerId,
+		},
+		data: {
+			status:status
+		},
+	});
+
+	return updatedCustomer;
+};
+
 export const CustomerServices = {
 	createCustomerAccount,
 	getAllCustomers,
 	getMyCustomers,
 	getCustomerById,
 	updateCustomerInfo,
+	changeCustomerStatus
 };

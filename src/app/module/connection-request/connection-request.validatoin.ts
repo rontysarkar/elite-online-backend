@@ -22,3 +22,7 @@ export const RequestedEmailVerifySchema = z.object({
 	email: z.email(),
 	otp: z.number(),
 });
+
+export const ResendEmailVerifySchema = z.object({
+	email: z.email(),
+});
