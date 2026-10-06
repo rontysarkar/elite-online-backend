@@ -83,7 +83,6 @@ const getAllArea = async () => {
 		include: {
 			collector: {
 				select: {
-					id: true,
 					name: true,
 				},
 			},
@@ -93,14 +92,29 @@ const getAllArea = async () => {
 				},
 			},
 		},
+		omit: {
+			collectorId: true,
+		}
 	});
 
 	if (!area) {
 		throw new AppError(httpStatus.NOT_FOUND, "Area Dose not exist");
 	}
 
-	return area;
+	const flattenedAreas = area?.map((item) => {
+		const { _count,collector, ...areaData } = item;
+
+		return {
+			...areaData,
+			collectorName: collector?.name || '',
+			totalCustomers: _count?.customer || 0,
+		};
+	});
+
+	return flattenedAreas;
 };
+
+
 
 const getAreaById = async (areaId: string) => {
 	const area = await prisma.area.findUnique({
