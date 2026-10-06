@@ -240,15 +240,24 @@ const acceptConnectionRequest = async (requestedId: string) => {
 
 const getAllConnectionRequest = async () => {
 	const allRequest = await prisma.connectionRequest.findMany({
+		omit:{
+			packageId:true,
+			areaId:true,
+		},
 		include: {
 			area: {
 				select: {
 					name: true,
 				},
 			},
-			package: true,
+			package: {
+				omit:{
+					id:true,
+				}
+			},
 		},
 	});
+
 
 	return allRequest;
 };

@@ -224,10 +224,12 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
       area: {
         collectorId: user.userId,
       },
+	  user:{
+		isDeleted:false
+	  }
     },
   ];
 
-  // Search
   if (query.searchTerm) {
     andConditions.push({
       OR: [
@@ -255,7 +257,6 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
     });
   }
 
-  // Area filter
   if (query.areaId) {
     andConditions.push({
       areaId: query.areaId,
@@ -297,6 +298,7 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
           },
         },
       },
+	
     },
 
     orderBy: {
@@ -325,10 +327,15 @@ const getCustomerById = async (customerId: string) => {
     where: {
       id: customerId,
     },
+	omit:{
+		userId:true,
+		packageId:true,
+		areaId:true,
+		updatedAt:true,
+	},
     include: {
       user: {
         select: {
-          id: true,
           name: true,
           email: true,
           phone: true,
@@ -337,18 +344,31 @@ const getCustomerById = async (customerId: string) => {
 
       area: {
         select: {
-          id: true,
           name: true,
-
           collector: {
             select: {
-              id: true,
               name: true,
             },
           },
         },
       },
-      package: true,
+      package: {
+		select:{
+			name:true,
+			speed:true,
+		}
+	  },
+	  bill:{
+		orderBy:{
+			createdAt:"desc"
+		},
+		select:{
+			month:true,
+			year:true,
+			amount:true,
+			status:true,
+		}
+	  },
     },
   });
 
