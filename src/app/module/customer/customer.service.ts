@@ -263,6 +263,12 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
     });
   }
 
+  if (query.status) {
+    andConditions.push({
+      status: query.status,
+    });
+  }
+
   const where: Prisma.CustomerWhereInput =
     andConditions.length > 0
       ? {
@@ -398,6 +404,7 @@ const getCustomerById = async (customerId: string) => {
           createdAt: "desc",
         },
         select: {
+          id: true,
           month: true,
           year: true,
           amount: true,
