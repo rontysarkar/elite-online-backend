@@ -10,7 +10,7 @@ import ejs from "ejs";
 import path from "path";
 import httpStatus from "http-status";
 import config from "../../config";
-import { CustomerStatus, Role } from "../../../generated/prisma/enums";
+import { BillStatus, CustomerStatus, Role } from "../../../generated/prisma/enums";
 import { transporter } from "../../lib/nodemailer";
 import { Prisma } from "../../../generated/prisma/client";
 import { IQuery, IRequestUser } from "../../interface";
@@ -224,9 +224,9 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
       area: {
         collectorId: user.userId,
       },
-	  user:{
-		isDeleted:false
-	  }
+      user: {
+        isDeleted: false,
+      },
     },
   ];
 
@@ -278,9 +278,6 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
     include: {
       user: {
         select: {
-          id: true,
-          name: true,
-          email: true,
           phone: true,
         },
       },
@@ -289,16 +286,21 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
         select: {
           id: true,
           name: true,
-
-          collector: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
         },
       },
-	
+      package: true,
+      _count:{
+        select:{
+          bill:{
+            where:{
+              // set unpaid or overdue in or condition 
+              status:{
+                in:[BillStatus.UNPAID,BillStatus.OVERDUE]
+              }
+            }
+          }
+        }
+      }
     },
 
     orderBy: {
@@ -310,6 +312,39 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
     where,
   });
 
+  const totalCustomers = await prisma.customer.count({
+    where: {
+      area: {
+        collectorId: user.userId,
+      },
+      user: {
+        isDeleted: false,
+      },
+    },
+  });
+  const activeCustomers = await prisma.customer.count({
+    where: {
+      status: CustomerStatus.ACTIVE,
+      area: {
+        collectorId: user.userId,
+      },
+      user: {
+        isDeleted: false,
+      },
+    },
+  });
+  const inactiveCustomers = await prisma.customer.count({
+    where: {
+      status: CustomerStatus.INACTIVE,
+      area: {
+        collectorId: user.userId,
+      },
+      user: {
+        isDeleted: false,
+      },
+    },
+  });
+
   return {
     meta: {
       page,
@@ -318,7 +353,7 @@ const getMyCustomers = async (query: IQuery, user: IRequestUser) => {
       totalPage: Math.ceil(total / limit),
     },
 
-    data: customers,
+    data: { totalCustomers, activeCustomers,inactiveCustomers, customers },
   };
 };
 
@@ -327,12 +362,12 @@ const getCustomerById = async (customerId: string) => {
     where: {
       id: customerId,
     },
-	omit:{
-		userId:true,
-		packageId:true,
-		areaId:true,
-		updatedAt:true,
-	},
+    omit: {
+      userId: true,
+      packageId: true,
+      areaId: true,
+      updatedAt: true,
+    },
     include: {
       user: {
         select: {
@@ -353,22 +388,22 @@ const getCustomerById = async (customerId: string) => {
         },
       },
       package: {
-		select:{
-			name:true,
-			speed:true,
-		}
-	  },
-	  bill:{
-		orderBy:{
-			createdAt:"desc"
-		},
-		select:{
-			month:true,
-			year:true,
-			amount:true,
-			status:true,
-		}
-	  },
+        select: {
+          name: true,
+          speed: true,
+        },
+      },
+      bill: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          month: true,
+          year: true,
+          amount: true,
+          status: true,
+        },
+      },
     },
   });
 
