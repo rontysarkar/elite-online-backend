@@ -51,9 +51,22 @@ const getMyPayments = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const getMyPaymentDetails = catchAsync(async (req: Request, res: Response) => {
+	const { billId } = req.params;
+	const user = req.user!;
+	const result = await PaymentServices.getMyPaymentDetails(billId as string, user);
+	sendResponse(res, {
+		success: true,
+		statusCode: httpStatus.OK,
+		message: "Retrieve Payment Details Successfully",
+		data: result,
+	});
+});
+
 export const PaymentController = {
 	createPaymentByCollector,
 	createPaymentByCustomer,
 	bkashPaymentCallback,
 	getMyPayments,
+	getMyPaymentDetails,
 };

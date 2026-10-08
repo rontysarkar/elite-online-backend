@@ -25,4 +25,10 @@ router.get(
 	auth(Role.CUSTOMER),
 	PaymentController.getMyPayments,
 );
+
+router.get(
+	"/my-payments/:billId",
+	auth(Role.CUSTOMER),
+	PaymentController.getMyPaymentDetails,
+);
 export const PaymentRoutes = router;

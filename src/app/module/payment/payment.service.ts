@@ -291,9 +291,70 @@ const getMyPayments = async (user: IRequestUser) => {
 	return payments;
 };
 
+// write get single my payment details
+const getMyPaymentDetails = async (billId: string, user: IRequestUser) => {
+	const payment = await prisma.payment.findUnique({
+		where: {
+			customer:{
+				userId:user.userId
+			},
+			billId:billId,
+		},
+		include: {
+			customer:{
+				select:{
+					address:true,
+					user:{
+						select:{
+							name:true,
+							email:true,
+							phone:true,
+						}
+					}
+				}
+			},
+			
+			bill:{
+				select:{
+					year:true,
+					month:true,
+					amount:true,
+					status:true,
+
+				}
+			},
+			collector:{
+				select:{
+					name:true,
+					phone:true,
+				}
+			}
+		},
+		omit:{
+			gatewayResponse:true,
+			paymentId:true,
+			merchantInvoiceNumber:true,
+			createdAt:true,
+			updatedAt:true,
+			billId:true,
+			customerId:true,
+			collectorId:true,
+
+		}
+		
+	});
+
+	if (!payment) {
+		throw new AppError(httpStatus.NOT_FOUND, "Payment Not Found");
+	}
+
+	return payment;
+};	
+
 export const PaymentServices = {
 	createPaymentByCollector,
 	createPaymentByCustomer,
 	bkashPaymentCallback,
 	getMyPayments,
+	getMyPaymentDetails,
 };

@@ -5,8 +5,8 @@ model Payment {
   method PaymentMethod
   status PaymentStatus @default(PENDING)
 
-  // when collector collect bill
-  collectorId String?
+
+  
 
   //when bkash payment
   paymentId String? @unique
@@ -23,6 +23,9 @@ model Payment {
   bill       Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  collectorId String?
+  collector   User? @relation(fields: [collectorId], references: [id],onDelete: Restrict)
 
   @@map("payments")
 }

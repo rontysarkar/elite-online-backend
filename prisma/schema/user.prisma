@@ -12,6 +12,7 @@ model User {
 
   customer Customer?
   area     Area[]
+  payment  Payment[]
 
   @@map("users")
 }

@@ -148,6 +148,11 @@ const getMyBills = async (query: IQuery, userId: string) => {
     where: {
       AND: andCondition,
     },
+    omit:{
+      customerId:true,
+      createdAt:true,
+      dueDate:true,
+    },
     orderBy: [
       {
         year: "desc",

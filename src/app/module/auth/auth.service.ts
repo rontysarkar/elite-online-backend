@@ -237,26 +237,20 @@ const getMe = async (user: IRequestUser) => {
 		include: {
 			area: {
 				select: {
-					id: true,
 					name: true,
 				},
 			},
 			customer: {
 				select: {
-					id: true,
 					address: true,
-					package: true,
+					package: {
+						omit:{
+							id:true
+						}
+					},
 					area: {
 						select: {
-							id: true,
 							name: true,
-							collector: {
-								select: {
-									id: true,
-									name: true,
-									phone: true,
-								},
-							},
 						},
 					},
 				},
