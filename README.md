@@ -7,6 +7,8 @@ This project is developed as a **Backend API** using Node.js, Express.js, TypeSc
 ## 🚀 Live API
 
 🔗 **Live API:** [Elite Online ISP API](https://elite-online-backend.vercel.app)
+🔗 **Frontend repository:** [Elite Online Frontend Repository](https://github.com/EliteOnline/elite-online-frontend)
+
 
 ---
 
