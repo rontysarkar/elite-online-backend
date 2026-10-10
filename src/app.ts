@@ -17,11 +17,15 @@ import { CustomerRoutes } from "./app/module/customer/customer.route";
 
 const app: Application = express();
 
+
 app.use(
-	cors({
-		origin: config.frontend_url,
-		credentials: true,
-	}),
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://elite-online-frontend.vercel.app",
+    ],
+    credentials: true,
+  }),
 );
 
 app.use(express.urlencoded({ extended: true }));

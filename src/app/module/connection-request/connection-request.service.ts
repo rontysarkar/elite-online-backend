@@ -26,6 +26,16 @@ const createConnectionRequest = async (
 		throw new AppError(httpStatus.NOT_FOUND, "Email Already Exist");
 	}
 
+	const isPhoneExist = await prisma.user.findUnique({
+		where: {
+			phone,
+		},
+	});
+
+	if (isPhoneExist) {
+		throw new AppError(httpStatus.NOT_FOUND, "Phone Already Exist");
+	}
+
 	await prisma.connectionRequest.upsert({
 		where: {
 			email,

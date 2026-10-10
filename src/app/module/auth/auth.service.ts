@@ -233,6 +233,8 @@ const getMe = async (user: IRequestUser) => {
 		},
 		omit: {
 			password: true,
+			updatedAt: true,
+			isDeleted: true,
 		},
 		include: {
 			area: {

@@ -137,7 +137,6 @@ const createPaymentByCustomer = async (billId: string, user: IRequestUser) => {
 
 	const createPaymentResult = await createPaymentResponse.json();
 
-	// ৩. bKash থেকে কোনো ভুল বা statusCode আসলে এখানেই আটকে দিন
 	if (!createPaymentResult || createPaymentResult.statusCode !== "0000") {
 		throw new AppError(
 			httpStatus.BAD_REQUEST,
@@ -237,7 +236,7 @@ const bkashPaymentCallback = async (query: Record<string, any>) => {
 			});
 
 			return {
-				redirectUrl: `${config.frontend_url}/dashboard/my-bill?status=success`,
+				redirectUrl: `${config.frontend_url}/customer/payment-result?status=success`,
 			};
 		} else if (status === "failure") {
 			await tx.payment.update({
@@ -251,7 +250,7 @@ const bkashPaymentCallback = async (query: Record<string, any>) => {
 			});
 
 			return {
-				redirectUrl: `${config.frontend_url}/dashboard/my-bills?status=failure`,
+				redirectUrl: `${config.frontend_url}/customer/payment-result?status=failure`,
 			};
 		} else if (status === "cancel") {
 			await tx.payment.update({
@@ -264,7 +263,7 @@ const bkashPaymentCallback = async (query: Record<string, any>) => {
 				},
 			});
 			return {
-				redirectUrl: `${config.frontend_url}/dashboard/my-bills?status=cancel`,
+				redirectUrl: `${config.frontend_url}/customer/payment-result?status=cancel`,
 			};
 		} else {
 			return {
@@ -291,7 +290,7 @@ const getMyPayments = async (user: IRequestUser) => {
 	return payments;
 };
 
-// write get single my payment details
+
 const getMyPaymentDetails = async (billId: string, user: IRequestUser) => {
 	const payment = await prisma.payment.findUnique({
 		where: {
